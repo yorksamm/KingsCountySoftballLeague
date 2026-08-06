@@ -85,6 +85,12 @@ npx vercel --prod
 
 ### 7. Search engines
 
+> **Never put a `"comment"` key in `vercel.json`.** JSON has no comment syntax
+> and Vercel validates the file against a strict schema — an unknown property
+> fails the build with `should NOT have additional property 'comment'`, and
+> Vercel silently keeps serving the previous deployment. Explain the config
+> here in the README instead.
+
 `vercel.json` is **required**, not optional. Without its rewrite, Vercel looks
 for a real file at `/schedule` and returns 404 — only `/` works. That breaks
 refreshing, bookmarking and sharing any page other than the home page, and it
