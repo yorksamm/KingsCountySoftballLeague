@@ -8,6 +8,17 @@ dist-ssr
 .env.local
 .env.*.local
 
+# Database scripts are kept on the league admin's machine, not in the repo
+# (removed from GitHub 2026-08-06). They contain no credentials — just the
+# schema, RLS policies, migrations and league data. Ignored here so a
+# `git add -A` can't put them back by accident.
+#
+# >> These are the only record of how the database is built. Keep a backup
+# >> somewhere other than this laptop.
+supabase_schema.sql
+supabase_seed.sql
+supabase_migration_*.sql
+
 .DS_Store
 *.log
 npm-debug.log*
