@@ -1,0 +1,139 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .8125rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  cursor: pointer;
+  padding-bottom: .5rem;
+}
+.toggle input { width: auto; }
+
+.count {
+  margin-left: auto;
+  padding-bottom: .5rem;
+  font-size: .8125rem;
+  color: var(--ink-mute);
+}
+
+/* Score-entry table -------------------------------------------------------
+   A table rather than cards: entering scores is a typing job, so the score
+   inputs sit in two fixed columns you can tab straight down. */
+.tableWrap {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .8125rem;
+}
+
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: .45rem .5rem;
+  background: var(--canvas);
+  border-bottom: 1px solid var(--line);
+  font-size: .625rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table tbody td {
+  padding: .25rem .5rem;
+  border-bottom: 1px solid var(--line-soft);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.table tbody tr:last-child td { border-bottom: none; }
+.table tbody tr:hover td { background: #fafbfc; }
+
+/* Rows with unsaved changes are highlighted in yellow — docs Section 4. */
+.dirty td { background: var(--dirty) !important; }
+.dirty td:first-child { box-shadow: inset 3px 0 0 var(--dirty-line); }
+
+.colDate   { width: 1%; color: var(--ink-soft); }
+.colTime   { width: 1%; color: var(--ink-soft); }
+.colGame   { width: 1%; text-align: center; color: var(--ink-mute); font-family: var(--font-mono); }
+.colScore  { width: 74px; }
+.colStatus { width: 220px; }
+.colField  {
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ink-mute);
+  font-size: .75rem;
+}
+
+.teamCell {
+  font-weight: 600;
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.winDot {
+  margin-left: .3rem;
+  font-size: .5rem;
+  color: var(--win);
+  vertical-align: middle;
+}
+
+.tieFlag {
+  margin-left: .35rem;
+  font-size: .5625rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--tie);
+}
+
+.scoreInput {
+  width: 100%;
+  padding: .2rem .25rem;
+  font-family: var(--font-mono);
+  font-size: .875rem;
+  text-align: center;
+  /* Spinner arrows eat roughly 16px of an already narrow box, which clipped
+     two-digit scores to their first digit. They're useless for typing a score
+     anyway. */
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.scoreInput::-webkit-outer-spin-button,
+.scoreInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.scoreInput:disabled { background: transparent; border-color: transparent; }
+
+.statusSelect {
+  width: 100%;
+  padding: .2rem .3rem;
+  font-size: .75rem;
+}
+
+@media (max-width: 900px) {
+  .colField { display: none; }
+  .colField:first-child { display: table-cell; }
+}

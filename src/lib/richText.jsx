@@ -1,0 +1,213 @@
+import { Fragment, useMemo } from 'react'
+import styles from './richText.module.css'
+
+/**
+ * A small, deliberately limited formatting language for announcements.
+ *
+ * WHY NOT A MARKDOWN LIBRARY: every one of them ultimately hands you an HTML
+ * string, which means `dangerouslySetInnerHTML`. Docs Section 8.3 rules that
+ * out — the admin session token lives in localStorage, so an injected script
+ * would be a real problem, and announcement text is the one place in this app
+ * where a human types content that everyone else reads.
+ *
+ * This parser never produces HTML. It builds React elements, which React
+ * escapes on its own, so a body containing `<script>` renders as those literal
+ * characters and nothing else. The only genuinely dangerous surface left is
+ * link hrefs, handled by safeHref below.
+ *
+ * Supported:
+ *   # Heading            ## Smaller heading      ### Smallest heading
+ *   - bullet             1. numbered
+ *   **bold**             *italic*
+ *   [text](https://…)    ---  (divider)
+ *   Blank line separates paragraphs.
+ */
+
+const SAFE_PROTOCOL = /^(https?:|mailto:)/i
+const BARE_DOMAIN = /^[\w-]+(\.[\w-]+)+(\/|$)/
+
+/** Returns a usable href, or null if the link should be shown as plain text. */
+function safeHref(raw) {
+  const href = String(raw ?? '').trim()
+  if (!href) return null
+  if (SAFE_PROTOCOL.test(href)) return href
+  if (href.startsWith('/')) return href                 // internal path
+  if (BARE_DOMAIN.test(href)) return `https://${href}`  // "kcsl.org/rules"
+  return null   // javascript:, data:, vbscript:, anything else
+}
+
+// Split on the inline markers while keeping the delimiters.
+const INLINE = /(\*\*[^*\n]+\*\*|\*[^*\n]+\*|\[[^\]\n]+\]\([^)\s]+\))/g
+
+function renderInline(text, keyPrefix) {
+  return String(text)
+    .split(INLINE)
+    .filter((part) => part !== '' && part != null)
+    .map((part, i) => {
+      const key = `${keyPrefix}i${i}`
+      let m
+
+      if ((m = /^\*\*([^*\n]+)\*\*$/.exec(part))) return <strong key={key}>{m[1]}</strong>
+      if ((m = /^\*([^*\n]+)\*$/.exec(part))) return <em key={key}>{m[1]}</em>
+
+      if ((m = /^\[([^\]\n]+)\]\(([^)\s]+)\)$/.exec(part))) {
+        const href = safeHref(m[2])
+        if (!href) return <Fragment key={key}>{m[1]}</Fragment>
+        const external = !href.startsWith('/')
+        return (
+          <a
+            key={key}
+            href={href}
+            {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+          >
+            {m[1]}
+          </a>
+        )
+      }
+
+      return <Fragment key={key}>{part}</Fragment>
+    })
+}
+
+const RE_HEADING = /^(#{1,3})\s+(.*)$/
+const RE_HR = /^\s*(-{3,}|\*{3,}|_{3,})\s*$/
+const RE_UL = /^\s*[-*+]\s+(.*)$/
+const RE_OL = /^\s*\d+[.)]\s+(.*)$/
+
+const isBlockStart = (line) =>
+  RE_HEADING.test(line) || RE_HR.test(line) || RE_UL.test(line) || RE_OL.test(line)
+
+/** Text -> a flat list of block descriptors. Exported for the admin preview. */
+export function parseBlocks(text) {
+  const lines = String(text ?? '').replace(/\r\n?/g, '\n').split('\n')
+  const blocks = []
+  let i = 0
+
+  while (i < lines.length) {
+    const line = lines[i]
+
+    if (!line.trim()) { i++; continue }
+
+    // Divider is checked before lists so "---" isn't read as a bullet.
+    if (RE_HR.test(line)) { blocks.push({ type: 'hr' }); i++; continue }
+
+    let m
+    if ((m = RE_HEADING.exec(line))) {
+      blocks.push({ type: 'heading', level: m[1].length, text: m[2] })
+      i++
+      continue
+    }
+
+    if (RE_UL.test(line)) {
+      const items = []
+      while (i < lines.length && RE_UL.test(lines[i])) {
+        items.push(RE_UL.exec(lines[i])[1])
+        i++
+      }
+      blocks.push({ type: 'ul', items })
+      continue
+    }
+
+    if (RE_OL.test(line)) {
+      const items = []
+      while (i < lines.length && RE_OL.test(lines[i])) {
+        items.push(RE_OL.exec(lines[i])[1])
+        i++
+      }
+      blocks.push({ type: 'ol', items })
+      continue
+    }
+
+    // Paragraph: consecutive lines until a blank line or a new block starts.
+    const para = []
+    while (i < lines.length && lines[i].trim() && !isBlockStart(lines[i])) {
+      para.push(lines[i])
+      i++
+    }
+    blocks.push({ type: 'p', lines: para })
+  }
+
+  return blocks
+}
+
+/**
+ * Render announcement body text.
+ *
+ * Heading levels start at h3 because the page supplies h1 and each
+ * announcement title is an h2 — keeping the document outline valid for screen
+ * readers rather than jumping straight from h2 to h1.
+ */
+export default function RichText({ text, className = '' }) {
+  const blocks = useMemo(() => parseBlocks(text), [text])
+
+  if (!blocks.length) return null
+
+  return (
+    <div className={[styles.prose, className].filter(Boolean).join(' ')}>
+      {blocks.map((block, b) => {
+        switch (block.type) {
+          case 'heading': {
+            const Tag = ['h3', 'h4', 'h5'][block.level - 1]
+            return <Tag key={b}>{renderInline(block.text, `b${b}`)}</Tag>
+          }
+          case 'hr':
+            return <hr key={b} />
+          case 'ul':
+            return (
+              <ul key={b}>
+                {block.items.map((item, j) => <li key={j}>{renderInline(item, `b${b}l${j}`)}</li>)}
+              </ul>
+            )
+          case 'ol':
+            return (
+              <ol key={b}>
+                {block.items.map((item, j) => <li key={j}>{renderInline(item, `b${b}l${j}`)}</li>)}
+              </ol>
+            )
+          default:
+            return (
+              <p key={b}>
+                {block.lines.map((line, j) => (
+                  <Fragment key={j}>
+                    {j > 0 && <br />}
+                    {renderInline(line, `b${b}l${j}`)}
+                  </Fragment>
+                ))}
+              </p>
+            )
+        }
+      })}
+    </div>
+  )
+}
+
+/**
+ * The opening paragraph only, as plain text — for the site banner.
+ *
+ * Flattening the WHOLE body reads badly the moment an announcement has
+ * structure: the first heading gets glued onto the end of the intro
+ * ("…times and fields. How seeding was decided Standing…"). Taking just the
+ * lead paragraph gives a summary that reads like a sentence, and the full post
+ * is one click away on the home page.
+ */
+export function firstParagraph(text, maxLength = 200) {
+  const lead = parseBlocks(text).find((b) => b.type === 'p')
+  if (!lead) return toPlainText(text, maxLength)
+  return toPlainText(lead.lines.join(' '), maxLength)
+}
+
+/** One-line plain-text summary, for the admin list. */
+export function toPlainText(text, maxLength = 160) {
+  const flat = String(text ?? '')
+    .replace(/\r\n?/g, '\n')
+    .replace(/^#{1,3}\s+/gm, '')
+    .replace(/^\s*[-*+]\s+/gm, '')
+    .replace(/^\s*\d+[.)]\s+/gm, '')
+    .replace(/^\s*(-{3,}|\*{3,}|_{3,})\s*$/gm, '')
+    .replace(/\[([^\]\n]+)\]\([^)\s]+\)/g, '$1')
+    .replace(/\*\*([^*\n]+)\*\*/g, '$1')
+    .replace(/\*([^*\n]+)\*/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim()
+  return flat.length > maxLength ? `${flat.slice(0, maxLength - 1).trimEnd()}…` : flat
+}

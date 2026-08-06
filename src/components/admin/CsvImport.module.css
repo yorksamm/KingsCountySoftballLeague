@@ -1,0 +1,158 @@
+.intro { margin: 0 0 1rem; font-size: .875rem; color: var(--ink-soft); }
+
+.templateBox {
+  margin-bottom: 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.templateHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .4rem .625rem;
+  background: var(--canvas);
+  border-bottom: 1px solid var(--line);
+  font-size: .6875rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.copy {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  padding: .1rem .4rem;
+  font-size: .625rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: var(--ink-soft);
+}
+.copy:hover { color: var(--ink); border-color: var(--ink-mute); }
+
+.template {
+  margin: 0;
+  padding: .625rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: .6875rem;
+  line-height: 1.7;
+  color: var(--ink);
+  background: var(--surface);
+  white-space: pre;
+}
+
+.hint { margin: .5rem .625rem .625rem; font-size: .75rem; color: var(--ink-mute); line-height: 1.5; }
+
+/* File picker ------------------------------------------------------------- */
+.fileLabel {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .75rem;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 400;
+}
+.fileLabel:hover { border-color: var(--navy-600); background: var(--line-soft); }
+
+.fileInput { position: absolute; width: 1px; height: 1px; opacity: 0; }
+
+.fileButton {
+  flex: none;
+  padding: .4rem .8rem;
+  border-radius: var(--radius-sm);
+  background: var(--navy-800);
+  color: #fff;
+  font-size: .8125rem;
+  font-weight: 600;
+}
+
+.fileName {
+  font-size: .8125rem;
+  color: var(--ink-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Errors ------------------------------------------------------------------ */
+.errorBox {
+  margin-top: 1rem;
+  border: 1px solid #e4bcbc;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.errorTitle {
+  margin: 0;
+  padding: .5rem .75rem;
+  background: var(--loss-bg);
+  color: var(--loss);
+  font-size: .8125rem;
+  font-weight: 700;
+}
+
+.errorScroll { max-height: 260px; overflow-y: auto; }
+
+.errorTable { width: 100%; border-collapse: collapse; font-size: .8125rem; }
+
+.errorTable thead th {
+  position: sticky;
+  top: 0;
+  padding: .35rem .75rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  font-size: .625rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+.errorTable tbody td {
+  padding: .35rem .75rem;
+  border-bottom: 1px solid var(--line-soft);
+  vertical-align: top;
+  line-height: 1.45;
+}
+
+.rowNum {
+  width: 3.5rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--loss);
+}
+
+.successBox {
+  padding: 1rem;
+  background: var(--win-bg);
+  border: 1px solid #bfe0cd;
+  border-radius: var(--radius-sm);
+  color: var(--turf-dark);
+}
+.successBox .hint { margin: .25rem 0 0; color: var(--turf-dark); opacity: .8; }
+
+/* Blank-template call to action ------------------------------------------- */
+.templateCta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem 1rem;
+  padding: .875rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #cddff0;
+  border-radius: var(--radius-sm);
+  background: #eef4fa;
+}
+
+.templateCta > div { display: flex; flex-direction: column; gap: .15rem; min-width: 200px; flex: 1; }
+.templateCta strong { font-size: .875rem; color: var(--navy-700); }
+.templateCta .hint { margin: 0; }

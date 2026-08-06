@@ -1,0 +1,71 @@
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  background:
+    radial-gradient(1200px 500px at 50% -10%, var(--navy-700), transparent 70%),
+    var(--navy-900);
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  padding: 1.75rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: 1.5rem;
+}
+
+.mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px; height: 44px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--clay);
+  color: #fff;
+  font-size: .8125rem;
+  font-weight: 800;
+}
+
+.title { margin: 0; font-size: 1.25rem; }
+.subtitle { margin: 0; font-size: .8125rem; color: var(--ink-mute); }
+
+.form { display: flex; flex-direction: column; gap: .875rem; }
+
+.field { display: flex; flex-direction: column; gap: .25rem; }
+
+.error {
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+  padding: .625rem .75rem;
+  border-radius: var(--radius-sm);
+  background: var(--loss-bg);
+  border: 1px solid #e4bcbc;
+  color: var(--loss);
+  font-size: .8125rem;
+}
+
+.errorHint { font-size: .75rem; opacity: .85; line-height: 1.45; }
+
+.note {
+  margin: 1.25rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line-soft);
+  font-size: .75rem;
+  color: var(--ink-mute);
+  line-height: 1.5;
+}
+
+.back { display: inline-block; margin-top: .5rem; font-size: .8125rem; }

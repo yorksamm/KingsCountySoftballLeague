@@ -1,0 +1,34 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  padding: .1rem .4rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: .6875rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+  line-height: 1.5;
+  white-space: nowrap;
+  cursor: help;
+}
+
+.final    { background: var(--navy-800);  color: #fff; }
+.neutral  { background: var(--line-soft); color: var(--ink-soft); border: 1px solid var(--line); }
+.warn     { background: var(--warn-bg);   color: var(--warn); }
+.dead     { background: var(--dead-bg);   color: var(--dead); text-decoration: line-through; }
+.forfeit  { background: var(--clay);      color: #fff; }
+
+.result { min-width: 1.5rem; cursor: default; }
+.win  { background: var(--win-bg);  color: var(--win); }
+.loss { background: var(--loss-bg); color: var(--loss); }
+.tie  { background: var(--tie-bg);  color: var(--tie); }
+
+.out {
+  background: transparent;
+  color: var(--ink-mute);
+  border: 1px dashed var(--ink-mute);
+  min-width: 0;
+  cursor: default;
+}

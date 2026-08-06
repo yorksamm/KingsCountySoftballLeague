@@ -1,0 +1,18 @@
+/* One matchup card per row, centred on the page.
+   Capped at a readable width so the score columns stay next to the centre
+   divider instead of drifting to the far edges of a wide monitor. */
+.feed {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+/* Keep the heading and schedule key on the same centred column as the cards,
+   so the page reads as one column rather than a left-aligned header sitting
+   above centred content. */
+.column {
+  max-width: 720px;
+  margin-inline: auto;
+}

@@ -1,0 +1,169 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border-top: 3px solid var(--navy-900);
+}
+
+.cardHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: .5rem;
+}
+
+.name {
+  margin: 0;
+  font-size: 1rem;
+  letter-spacing: -.01em;
+}
+
+.out {
+  flex: none;
+  font-size: .625rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  border: 1px dashed var(--ink-mute);
+  border-radius: 3px;
+  padding: .05rem .3rem;
+}
+
+.division {
+  margin: .1rem 0 .75rem;
+  font-size: .75rem;
+  color: var(--ink-mute);
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.record {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .25rem;
+  margin: 0 0 .875rem;
+  padding: .625rem 0;
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.record > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .1rem;
+}
+
+.record dt {
+  font-size: .625rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+.record dd {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
+}
+
+.cardFoot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: .35rem;
+  margin-top: auto;
+  font-size: .8125rem;
+}
+
+.contact { color: var(--ink-soft); }
+
+/* Roster ------------------------------------------------------------------ */
+.rosterButton {
+  width: 100%;
+  min-height: 40px;
+  margin-bottom: .75rem;
+  padding: .45rem .75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--navy-700);
+  font-size: .875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.rosterButton:hover:not(:disabled) {
+  background: var(--navy-900);
+  border-color: var(--navy-900);
+  color: #fff;
+}
+.rosterButton:disabled {
+  color: var(--ink-mute);
+  cursor: default;
+  background: var(--canvas);
+}
+
+.rosterMeta {
+  margin: 0 0 .875rem;
+  padding-bottom: .75rem;
+  border-bottom: 1px solid var(--line-soft);
+  font-size: .8125rem;
+  color: var(--ink-soft);
+}
+
+.rosterList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.rosterRow {
+  display: flex;
+  align-items: center;
+  gap: .875rem;
+  padding: .5rem .25rem;
+  border-bottom: 1px solid var(--line-soft);
+}
+.rosterRow:last-child { border-bottom: none; }
+
+.jersey {
+  flex: none;
+  width: 2.5rem;
+  text-align: center;
+  padding: .15rem .25rem;
+  border-radius: 4px;
+  background: var(--navy-900);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: .875rem;
+  font-weight: 700;
+}
+
+.playerName { font-size: 1rem; font-weight: 500; }
+
+.outInline {
+  margin-left: .4rem;
+  font-size: .5625rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  border: 1px dashed var(--ink-mute);
+  border-radius: 3px;
+  padding: 0 .25rem;
+}

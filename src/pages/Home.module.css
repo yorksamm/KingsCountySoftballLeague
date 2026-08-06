@@ -1,0 +1,137 @@
+/* The landing page is a reading page. Everything sits in one narrow measure —
+   roughly 68 characters — because long lines are what actually make body text
+   hard to follow, more than font size does. */
+
+.page { }
+
+.masthead {
+  max-width: 720px;
+  margin: 0 auto 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 3px solid var(--navy-900);
+}
+
+.title {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.15;
+  letter-spacing: -.02em;
+}
+
+.tagline {
+  margin: .35rem 0 0;
+  font-size: 1.0625rem;
+  color: var(--ink-soft);
+}
+
+/* "Next games" strip ------------------------------------------------------ */
+.nextStrip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .35rem .85rem;
+  max-width: 720px;
+  margin: 0 auto 2rem;
+  padding: .95rem 1.15rem;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--clay);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}
+.nextStrip:hover {
+  text-decoration: none;
+  border-color: var(--clay);
+  border-left-color: var(--clay);
+  background: #fffaf7;
+}
+
+.nextLabel {
+  font-size: .6875rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--clay-dark);
+}
+
+.nextDate { font-size: 1.0625rem; font-weight: 700; }
+
+.nextCount { font-size: .9375rem; color: var(--ink-soft); }
+
+.nextGo { margin-left: auto; font-size: 1.125rem; color: var(--clay); font-weight: 700; }
+
+/* Posts ------------------------------------------------------------------- */
+.feed {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.post {
+  padding: 1.75rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* Pinned posts also ride the site-wide banner, so they get a visual tie-in. */
+.pinned { border-top: 4px solid var(--clay); }
+
+.postHead {
+  margin-bottom: 1.1rem;
+  padding-bottom: .9rem;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.pinnedTag {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  margin-bottom: .5rem;
+  padding: .15rem .5rem;
+  border-radius: 4px;
+  background: var(--clay);
+  color: #fff;
+  font-size: .6875rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.postTitle {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.25;
+  letter-spacing: -.015em;
+}
+
+.postDate {
+  display: block;
+  margin-top: .3rem;
+  font-size: .875rem;
+  color: var(--ink-mute);
+}
+
+/* Footer links ------------------------------------------------------------ */
+.pageFoot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem 1.75rem;
+  max-width: 720px;
+  margin: 2.5rem auto 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.footLink { font-size: 1rem; font-weight: 600; }
+
+@media (max-width: 560px) {
+  .title { font-size: 1.625rem; }
+  .post { padding: 1.25rem; }
+  .postTitle { font-size: 1.25rem; }
+  .nextGo { margin-left: 0; }
+}

@@ -1,0 +1,225 @@
+.shell { display: flex; flex-direction: column; min-height: 100%; }
+
+/* Announcement banner ----------------------------------------------------- */
+.banner { background: var(--clay); color: #fff; }
+
+.bannerInner {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding-top: .6rem;
+  padding-bottom: .6rem;
+}
+
+.bannerText {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .25rem .5rem;
+  font-size: .875rem;
+  line-height: 1.45;
+}
+
+.pin { font-size: .75rem; opacity: .85; }
+.bannerTitle { font-weight: 700; }
+.bannerBody { opacity: .95; }
+
+.bannerMore {
+  color: #fff;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+}
+.bannerMore:hover { opacity: .85; }
+
+.dismiss {
+  flex: none;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 1.35rem;
+  line-height: 1;
+  padding: 0 .2rem;
+  cursor: pointer;
+  opacity: .8;
+}
+.dismiss:hover { opacity: 1; }
+
+/* Header ------------------------------------------------------------------ */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--navy-900);
+  color: #fff;
+}
+
+.headerInner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 60px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  color: #fff;
+  margin-right: auto;
+}
+.brand:hover { text-decoration: none; }
+
+.mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--clay);
+  font-size: .75rem;
+  font-weight: 800;
+  letter-spacing: .02em;
+}
+
+.brandName {
+  font-size: .9375rem;
+  font-weight: 700;
+  letter-spacing: -.01em;
+}
+
+.nav { display: flex; align-items: center; gap: .15rem; }
+
+/* Nav targets are sized for readability and for imprecise taps: 15px text and
+   a 44px minimum height, which is the usual accessible touch-target floor. */
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: .45rem .8rem;
+  border-radius: var(--radius-sm);
+  color: rgba(255, 255, 255, .82);
+  font-size: .9375rem;
+  font-weight: 600;
+}
+.navLink:hover { background: rgba(255, 255, 255, .1); color: #fff; text-decoration: none; }
+.navActive { background: rgba(255, 255, 255, .16); color: #fff; }
+
+/* Admin entry: set apart from the public pages by a divider and an outline. */
+.navAdmin {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  min-height: 44px;
+  margin-left: .6rem;
+  padding: .4rem .85rem;
+  border: 1px solid rgba(255, 255, 255, .32);
+  border-radius: var(--radius-sm);
+  color: rgba(255, 255, 255, .82);
+  font-size: .9375rem;
+  font-weight: 600;
+  position: relative;
+}
+.navAdmin::before {
+  content: '';
+  position: absolute;
+  left: -.6rem;
+  top: 20%;
+  height: 60%;
+  border-left: 1px solid rgba(255, 255, 255, .2);
+}
+.navAdmin:hover {
+  background: rgba(255, 255, 255, .14);
+  border-color: rgba(255, 255, 255, .55);
+  color: #fff;
+  text-decoration: none;
+}
+
+.lockIcon { flex: none; }
+
+.menuToggle {
+  display: none;
+  border: 1px solid rgba(255, 255, 255, .25);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: #fff;
+  padding: .3rem .6rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+/* Main / footer ----------------------------------------------------------- */
+.main { flex: 1; padding: 1.5rem 0 3rem; }
+
+.footer {
+  background: var(--navy-900);
+  color: rgba(255, 255, 255, .7);
+  font-size: .9375rem;
+}
+
+.footerInner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  justify-content: space-between;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.footerText { display: flex; flex-direction: column; gap: .15rem; }
+
+.footerName { font-weight: 700; color: #fff; font-size: 1rem; }
+
+.footerMeta { color: rgba(255, 255, 255, .6); }
+
+.footer a { color: rgba(255, 255, 255, .85); }
+
+/* The admin entry point. Deliberately a button-sized target with an explicit
+   label rather than a small "League admin" text link. */
+.adminButton {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  min-height: 48px;
+  padding: .7rem 1.35rem;
+  border: 1px solid rgba(255, 255, 255, .4);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, .06);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.adminButton:hover {
+  background: var(--clay);
+  border-color: var(--clay);
+  color: #fff;
+  text-decoration: none;
+}
+
+@media (max-width: 720px) {
+  .menuToggle { display: block; min-height: 44px; min-width: 44px; }
+  .nav {
+    display: none;
+    flex-basis: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: .1rem;
+    padding-bottom: .75rem;
+  }
+  .navOpen { display: flex; }
+  .brandName { font-size: .875rem; }
+
+  /* In the collapsed menu the divider makes no sense — separate with space. */
+  .navAdmin { margin-left: 0; margin-top: .5rem; justify-content: center; }
+  .navAdmin::before { display: none; }
+
+  /* Footer stacks; the admin button goes full width so it can't be missed. */
+  .footerInner { flex-direction: column; align-items: stretch; text-align: center; }
+  .footerText { align-items: center; }
+  .adminButton { justify-content: center; }
+}

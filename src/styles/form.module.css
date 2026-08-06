@@ -1,0 +1,50 @@
+/* Shared form layout for the admin modals. */
+
+.form { display: flex; flex-direction: column; gap: .875rem; }
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: .875rem;
+}
+
+.field { display: flex; flex-direction: column; gap: .25rem; min-width: 0; }
+
+.hint { font-size: .6875rem; color: var(--ink-mute); line-height: 1.4; }
+
+.checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: .5rem;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.checkbox input { width: auto; margin-top: .2rem; flex: none; }
+
+.checkboxText { display: flex; flex-direction: column; }
+.checkboxLabel { font-weight: 600; font-size: .8125rem; }
+
+.error {
+  padding: .55rem .75rem;
+  border-radius: var(--radius-sm);
+  background: var(--loss-bg);
+  border: 1px solid #e4bcbc;
+  color: var(--loss);
+  font-size: .8125rem;
+}
+
+.divider {
+  height: 1px;
+  background: var(--line);
+  margin: .25rem 0;
+  border: none;
+}
+
+.sectionLabel {
+  font-size: .6875rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}

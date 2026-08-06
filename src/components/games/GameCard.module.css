@@ -1,0 +1,201 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* Header ------------------------------------------------------------------ */
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .5rem .875rem;
+  background: var(--navy-900);
+  color: #fff;
+}
+
+.date {
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.division {
+  font-size: .6875rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  padding: .1rem .45rem;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, .14);
+}
+
+/* Horizontal matchup ------------------------------------------------------
+   Three columns throughout: visitor | centre | home. The centre column is a
+   fixed basis so the times stack in a straight line under the "@". */
+.body { padding: .875rem .875rem 1rem; }
+
+.teamRow, .gameRow {
+  display: grid;
+  grid-template-columns: 1fr minmax(112px, auto) 1fr;
+  align-items: center;
+  gap: .5rem;
+}
+
+.teamRow { padding-bottom: .625rem; }
+
+.teamCell {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: .05rem;
+}
+.teamCell.left  { align-items: flex-start; text-align: left; }
+.teamCell.right { align-items: flex-end;   text-align: right; }
+
+.teamName {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  flex-wrap: wrap;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  line-height: 1.2;
+}
+.teamCell.right .teamName { justify-content: flex-end; }
+
+.highlight .teamName { color: var(--clay-dark); }
+
+.role {
+  font-size: .5625rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+.outTag {
+  font-size: .5625rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  border: 1px dashed var(--line);
+  border-radius: 3px;
+  padding: 0 .25rem;
+}
+
+.at {
+  text-align: center;
+  font-size: .875rem;
+  font-weight: 700;
+  color: var(--ink-mute);
+}
+
+/* One row per game -------------------------------------------------------- */
+.gameRow {
+  padding: .45rem 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .15rem;
+  text-align: center;
+}
+
+.gameMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.25;
+}
+
+.gameLabel {
+  font-size: .5625rem;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+.gameTime {
+  font-size: .8125rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.gameStatus { display: flex; align-items: center; gap: .25rem; flex-wrap: wrap; justify-content: center; }
+
+/* Scores sit next to the centre divider so they read as one score line. */
+.scoreCell {
+  display: flex;
+  align-items: baseline;
+  gap: .3rem;
+  min-width: 0;
+}
+.scoreCell.right { justify-content: flex-end; }
+.scoreCell.left  { justify-content: flex-start; }
+
+.score {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--ink-mute);
+  line-height: 1.1;
+}
+.scoreWin  { color: var(--ink); font-weight: 700; }
+.scoreLoss { color: var(--ink-mute); }
+
+.sideTag {
+  font-size: .5625rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: var(--ink-mute);
+}
+
+/* Footer ------------------------------------------------------------------ */
+.foot {
+  padding: .625rem .875rem;
+  background: var(--canvas);
+  border-top: 1px solid var(--line);
+  font-size: .8125rem;
+  text-align: center;
+}
+
+.venue {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: .25rem .5rem;
+}
+
+.fieldName { font-weight: 600; }
+.address { color: var(--ink-soft); }
+.map { font-weight: 600; font-size: .75rem; white-space: nowrap; }
+
+.note, .gameNote {
+  margin: .35rem 0 0;
+  color: var(--ink-soft);
+  font-size: .75rem;
+  line-height: 1.45;
+}
+.gameNote { color: var(--ink); }
+
+@media (max-width: 420px) {
+  .teamRow, .gameRow { grid-template-columns: 1fr auto 1fr; gap: .35rem; }
+  .teamName { font-size: .875rem; }
+  .score { font-size: 1.25rem; }
+  .gameTime { font-size: .75rem; }
+}

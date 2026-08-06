@@ -1,0 +1,145 @@
+/* ==========================================================================
+   Kings County Softball League — global styles and design tokens.
+   Everything component-scoped lives in a .module.css file next to it.
+   ========================================================================== */
+
+:root {
+  /* Brand ---------------------------------------------------------------- */
+  --navy-900: #0d1b2a;
+  --navy-800: #14293d;
+  --navy-700: #1c3a54;
+  --navy-600: #27506f;
+
+  --clay:     #b4552d;   /* infield dirt — accent */
+  --clay-dark:#8f3f1e;
+  --turf:     #2f7d4f;   /* wins */
+  --turf-dark:#1f5c39;
+
+  /* Neutrals ------------------------------------------------------------- */
+  --ink:      #16202b;
+  --ink-soft: #4a5866;
+  --ink-mute: #78889a;
+  --line:     #dde3ea;
+  --line-soft:#eef2f6;
+  --surface:  #ffffff;
+  --canvas:   #f4f6f9;
+
+  /* Status --------------------------------------------------------------- */
+  --win:      #2f7d4f;
+  --win-bg:   #e7f4ec;
+  --loss:     #b03030;
+  --loss-bg:  #fbeaea;
+  --tie:      #8a6d1f;
+  --tie-bg:   #fdf4dc;
+  --warn:     #a8641a;
+  --warn-bg:  #fdf0e0;
+  --dead:     #6b7684;
+  --dead-bg:  #eef1f4;
+  --dirty:    #fff8dd;   /* unsaved-row highlight */
+  --dirty-line:#e8d68a;
+
+  /* Type ----------------------------------------------------------------- */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+               "Liberation Mono", monospace;
+
+  /* Layout --------------------------------------------------------------- */
+  --radius:    10px;
+  --radius-sm: 6px;
+  --shadow:    0 1px 2px rgba(16, 32, 48, .06), 0 4px 14px rgba(16, 32, 48, .06);
+  --shadow-lg: 0 8px 32px rgba(16, 32, 48, .18);
+  --wrap:      1120px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--canvas);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  margin: 0 0 .4em;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -.011em;
+}
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.25rem; }
+h3 { font-size: 1.05rem; }
+
+p { margin: 0 0 1em; }
+
+a { color: var(--navy-600); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Focus ring — visible for keyboards, quiet for mice. */
+:focus-visible {
+  outline: 2px solid var(--navy-600);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Form controls ----------------------------------------------------------- */
+input, select, textarea, button { font: inherit; color: inherit; }
+
+input[type="text"], input[type="email"], input[type="password"],
+input[type="date"], input[type="time"], input[type="number"],
+input[type="url"], select, textarea {
+  width: 100%;
+  padding: .5rem .625rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  transition: border-color .12s ease, box-shadow .12s ease;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--navy-600);
+  box-shadow: 0 0 0 3px rgba(39, 80, 111, .14);
+}
+input:disabled, select:disabled, textarea:disabled {
+  background: var(--line-soft);
+  color: var(--ink-mute);
+  cursor: not-allowed;
+}
+textarea { min-height: 88px; resize: vertical; }
+
+label { font-weight: 600; font-size: .8125rem; color: var(--ink-soft); }
+
+/* Utilities --------------------------------------------------------------- */
+.wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}

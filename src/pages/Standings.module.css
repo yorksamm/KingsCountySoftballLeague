@@ -1,0 +1,38 @@
+.pos { color: var(--win); font-weight: 600; }
+.neg { color: var(--loss); }
+
+.out {
+  margin-left: .4rem;
+  font-size: .5625rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  border: 1px dashed var(--ink-mute);
+  border-radius: 3px;
+  padding: 0 .25rem;
+  vertical-align: middle;
+}
+
+.legend {
+  margin-top: 1.5rem;
+  padding: 1rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-size: .8125rem;
+  color: var(--ink-soft);
+}
+
+.legendTitle {
+  margin: 0 0 .5rem;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.legend ul { margin: 0; padding-left: 1.1rem; }
+.legend li { margin-bottom: .3rem; line-height: 1.5; }
+.legend strong { color: var(--ink); }

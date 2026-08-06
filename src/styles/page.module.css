@@ -1,0 +1,139 @@
+/* Shared layout primitives for the public pages. Imported by several
+   components — CSS Modules still scopes every class name. */
+
+.page { }
+
+.pageHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: .5rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.title { margin: 0; }
+
+.subtitle {
+  margin: .15rem 0 0;
+  color: var(--ink-soft);
+  font-size: .875rem;
+}
+
+.section { margin-bottom: 2rem; }
+
+.sectionHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .5rem;
+  margin-bottom: .75rem;
+  padding-bottom: .4rem;
+  border-bottom: 2px solid var(--navy-900);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.count { color: var(--ink-mute); font-size: .8125rem; font-weight: 500; }
+
+/* Filter bar -------------------------------------------------------------- */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  padding: .875rem 1rem;
+  margin-bottom: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.filter {
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
+  min-width: 170px;
+  flex: 1 1 170px;
+}
+
+.filterLabel {
+  font-size: .6875rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+.filterReset { display: flex; align-items: flex-end; }
+
+/* Card grid --------------------------------------------------------------- */
+/* Min track is sized for the horizontal matchup card — visitor, times, home
+   all on one line need more room than the old stacked scoreboard did. */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 440px) {
+  .cardGrid { grid-template-columns: 1fr; }
+}
+
+/* Data table -------------------------------------------------------------- */
+.tableWrap {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .875rem;
+  white-space: nowrap;
+}
+
+.table thead th {
+  position: sticky;
+  top: 0;
+  padding: .55rem .75rem;
+  background: var(--navy-900);
+  color: #fff;
+  font-size: .6875rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-align: right;
+}
+.table thead th:first-child { text-align: left; }
+
+.table tbody td {
+  padding: .55rem .75rem;
+  border-top: 1px solid var(--line-soft);
+  text-align: right;
+}
+.table tbody td:first-child { text-align: left; }
+
+.table tbody tr:nth-child(even) { background: #fafbfc; }
+.table tbody tr:hover { background: var(--line-soft); }
+
+.rank {
+  display: inline-block;
+  width: 1.5rem;
+  color: var(--ink-mute);
+  font-family: var(--font-mono);
+  font-size: .75rem;
+}
+
+.teamCell { font-weight: 600; }
+
+.leaderRow td { background: #f2f7f4 !important; }

@@ -1,0 +1,49 @@
+/* Reading-optimised prose. The league's audience skews older, so this runs a
+   step larger and looser than the rest of the UI. */
+.prose {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+.prose > *:first-child { margin-top: 0; }
+.prose > *:last-child { margin-bottom: 0; }
+
+.prose p { margin: 0 0 1.1em; }
+
+.prose h3,
+.prose h4,
+.prose h5 {
+  margin: 1.6em 0 .5em;
+  line-height: 1.3;
+  color: var(--navy-900);
+}
+
+.prose h3 { font-size: 1.3125rem; }
+.prose h4 { font-size: 1.125rem; }
+.prose h5 { font-size: 1rem; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); }
+
+.prose ul,
+.prose ol {
+  margin: 0 0 1.1em;
+  padding-left: 1.4em;
+}
+
+.prose li { margin-bottom: .4em; }
+.prose li::marker { color: var(--clay); }
+
+.prose strong { font-weight: 700; }
+.prose em { font-style: italic; }
+
+.prose a {
+  color: var(--navy-600);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose a:hover { color: var(--clay-dark); }
+
+.prose hr {
+  margin: 1.75em 0;
+  border: none;
+  border-top: 1px solid var(--line);
+}

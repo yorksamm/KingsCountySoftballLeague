@@ -1,0 +1,229 @@
+================================================================================
+KCSL — CSV IMPORT FORMATS
+================================================================================
+
+THE ONE RULE THAT BREAKS MOST IMPORTS
+--------------------------------------------------------------------------------
+Team names, division names, and field names must match what is already in the
+database EXACTLY — same capitalization, same spacing, same punctuation.
+
+  "Marine Pk #5"   is NOT   "Marine Pk # 5"
+  "Post Time"      is NOT   "POST TIME"
+  "GATORS "        is NOT   "GATORS"        (trailing space)
+
+Every row is validated before anything is written. If one row fails, the whole
+file is rejected and nothing is imported — you get a table of errors by row
+number, with a "did you mean…" suggestion when a name is close to an existing
+one. Fix the file and re-import.
+
+Save from Excel/Sheets as "CSV UTF-8". Keep the header row.
+
+DON'T TYPE THE HEADER ROW YOURSELF. Every import dialog has a
+**Download template** button that gives you a CSV with the correct headers and
+no rows — open it, fill it in, upload it. The examples in this file and in the
+dialogs are for reading; they're deliberately NOT in the downloaded template, so
+you can't import the sample rows by mistake.
+
+
+================================================================================
+1. TEAMS  —  teams_import.csv
+================================================================================
+
+name,division,contact_name,contact_email
+GATORS,B 2026,,
+HEAT,B 2026,Jane Smith,jane@email.com
+MACHINE,B 2026,,
+
+  name           Required. Must be unique across the whole league.
+  division       Required. Must match an existing division name exactly.
+  contact_name   Optional. Leave blank but KEEP the column.
+  contact_email  Optional. Validated as an email address if present.
+
+A team that already exists is an error, not an update — rename existing teams in
+the admin panel instead. Renaming is always safe: games reference a team by its
+internal ID, never by name, so past results never come unstuck.
+
+
+================================================================================
+2. SCHEDULE  —  schedule_import.csv
+================================================================================
+
+game_date,start_time,division,home_team,visitor_team,field,status,home_score,visitor_score,notes
+2026-06-21,09:00,B 2026,GATORS,HEAT,Marine Pk # 5,tbp,,,
+2026-06-21,10:00,B 2026,GATORS,HEAT,Marine Pk # 5,tbp,,,
+2026-06-21,09:00,B 2026,MACHINE,RIPPERZ,Marine Pk # 9,final,8,4,
+
+  game_date      Required. YYYY-MM-DD.  2026-06-21
+  start_time     Optional. HH:MM, 24-hour.  09:00  13:30   (NOT "9:00 am")
+  division       Required. Must match an existing division exactly.
+  home_team      Required. Must match an existing team exactly.
+  visitor_team   Required. Must match an existing team exactly.
+  field          Required. Must match an existing field exactly.
+                 Use the "TBD" field if the site isn't assigned yet.
+  status         Required. One of the values listed below.
+  home_score     Blank unless status is `final`.
+  visitor_score  Blank unless status is `final`.
+  notes          Optional. Free text.
+
+Home and visitor may belong to DIFFERENT divisions — that's a crossover game.
+The row's `division` decides which division's schedule it shows up under.
+
+
+VALID STATUS VALUES
+--------------------------------------------------------------------------------
+  tbp            TBP    To Be Played
+  final          F      Complete, both scores required
+  not_reported   N/R    Played, score not entered yet
+  cancelled      CAN    Will not be played
+  postponed      PPD    Rescheduled, new date TBA
+  suspended      SPD    Stopped, will be resumed later
+  forfeit        FFT    Forfeit pending league review — counts toward NOTHING
+  forfeit_loss   FFT-L  The HOME team forfeited     -> home L, visitor W
+  forfeit_win    FFT-W  The VISITOR team forfeited  -> home W, visitor L
+
+  >> forfeit_loss and forfeit_win are named from the HOME team's point of view.
+  >> `forfeit_win` gives the VISITING team a LOSS. Read that twice.
+  >> If you're entering one game, use the admin panel instead — its dropdown
+  >> spells out which team forfeited so there's nothing to remember.
+
+There is NO status value for a tie. A tie is simply `final` with equal scores.
+
+
+DOUBLE HEADERS, TRIPLEHEADERS, AND THE DUPLICATE RULE
+--------------------------------------------------------------------------------
+Each game is its own row. Rows belong to the same matchup when they share:
+
+    the same date  +  the same field  +  the same two teams
+
+Which team is listed as home does NOT matter for that grouping — some divisions
+swap home/away between games, and that is allowed:
+
+  2026-06-21,09:00,B 2026,GATORS,HEAT,Marine Pk # 5,final,4,7,
+  2026-06-21,10:00,B 2026,HEAT,GATORS,Marine Pk # 5,final,3,9,   <- sides swapped, still Game 2
+  2026-06-21,11:00,B 2026,GATORS,HEAT,Marine Pk # 5,final,2,5,   <- Game 3, fine
+
+>> THE DUPLICATE RULE: the same two teams may play as many games as you like on
+>> one date and field — but never two at the SAME START TIME.
+
+That's what a re-imported file looks like (identical dates, fields, teams AND
+times), and it is rejected both by the importer and by the database itself.
+Game numbers are assigned in start-time order.
+
+
+================================================================================
+3. ROSTERS  —  roster_import.csv
+================================================================================
+
+team,name,jersey_number
+GATORS,Mike Torres,12
+GATORS,Anthony Ruiz,7
+HEAT,Danny Alvarez,
+
+  team           Required. Must match an existing team name exactly.
+  name           Required. The player's name as it should appear publicly.
+  jersey_number  Optional. Digits only, up to 3. Leave blank if unassigned.
+                 "00" is kept as written and is a DIFFERENT number from "0".
+
+Two rules stop a re-imported roster from duplicating a squad:
+
+  - A player name can only appear once per team. Genuine namesakes need a
+    suffix ("Mike Smith Jr").
+  - A jersey number can only be used once per team. Any number of players may
+    have no number.
+
+The same name on two DIFFERENT teams is fine.
+
+
+================================================================================
+4. SCORE ENTRY  —  the Game Results sheet
+================================================================================
+
+For entering a lot of results at once, don't type into the browser. In the admin
+panel go to Game Results and use:
+
+  Download sheet   exports exactly the games currently listed (so filter by
+                   division, or tick "Hide games already marked Final", first)
+  Upload scores    applies the sheet back
+
+The file looks like this:
+
+game_id,game_date,start_time,division,visitor_team,home_team,field,status,visitor_score,home_score
+991b1914-...,2026-04-26,09:00,B 2026,MACHINE,CERVECEROS,Marine Pk # 10,tbp,,
+49c6e840-...,2026-04-26,09:00,B 2026,TAINOS,BLUE DEVILS,Marine Pk # 2,tbp,,
+
+  EDIT ONLY:  visitor_score, home_score  (and status, only when there's no score)
+  NEVER EDIT: game_id — it is how each row is matched back to a game
+
+>> YOU DO NOT NEED TO TOUCH THE STATUS COLUMN TO ENTER A SCORE.
+>> Type both scores and leave status as `tbp`. Filling in a score IS the
+>> statement that the game was played, so the row is set to `final` for you and
+>> the import tells you how many it promoted.
+
+Change the status column only when there is no score to enter — a game that was
+cancelled, postponed, suspended, or forfeited.
+
+Everything else is there so you can find the row you want; those columns are
+ignored on upload. Because matching is on game_id, renaming a team between
+download and upload doesn't break anything.
+
+Rows you didn't change are skipped, so re-uploading the same sheet twice is
+harmless. Same all-or-nothing rule: if any row fails, nothing is written.
+
+
+SCORES ARE ALWAYS VISITOR – HOME
+--------------------------------------------------------------------------------
+On the site a score reads `7 – 4`: the visitor scored 7, the home team 4, so the
+home team lost. In the CSV the columns are labelled, so put each team's runs in
+its own column and the display takes care of itself.
+
+
+================================================================================
+5. COMMON ERRORS AND WHAT THEY MEAN
+================================================================================
+
+  Row 8: Leftover empty row from your spreadsheet — the only thing in it is
+         status = "s". Select the blank rows below your data and delete the
+         whole rows...
+      Excel and Numbers keep rows you have "cleared" as empty rows in the file,
+      and a stray keystroke in one of them becomes a row with no date and no
+      teams. Clearing the cells is NOT enough: click the row NUMBERS below your
+      last real row, right-click, and choose Delete Row. Then save again.
+
+      The row number in this message is the real row number in your
+      spreadsheet, so you can go straight to it.
+
+  Row 4: field 'Marine Pk #5' not found — did you mean 'Marine Pk # 5'?
+      Spacing. Copy the name straight out of Admin -> Fields.
+
+  Row 7: Invalid status 'F'
+      Use the lowercase snake_case value (`final`), not the display code.
+
+  Row 9: Invalid time '9:00 am'
+      24-hour, no am/pm. Use 09:00. Excel loves to reformat this column —
+      set it to Text before typing.
+
+  Row 12: ... is marked 'cancelled' but has a score.
+      A cancelled/postponed/suspended/forfeited game has no result, so a score
+      there is a contradiction rather than a missing status. Clear the score
+      cells, or change the status if the game was actually played.
+      (Legacy exports write 0-0 on cancelled games — clear those.)
+
+      Note this does NOT apply to `tbp` or `not_reported`: a score on one of
+      those is accepted and the game is marked final automatically.
+
+  Row 15: ... has only one score — enter both, or clear the one you entered
+      Half a score is an unfinished edit. Both columns or neither.
+
+  Row 21: Mike Torres is already on GATORS.
+      This roster has already been imported. Remove the rows that already
+      exist, or edit the player in the admin panel.
+
+  Row 22: GATORS already has a player wearing #12
+      Jersey numbers are unique within a team. Check for a typo, or leave the
+      number blank until it's settled.
+
+  Row 18: Already scheduled — HEAT at GATORS on 2026-06-21 at Marine Pk # 5
+          at 09:00 is already on the schedule.
+      Two teams can't play twice at the same time on the same field. Usually
+      this means the file has already been imported once. If it's a genuine
+      extra game, give it a different start time.
