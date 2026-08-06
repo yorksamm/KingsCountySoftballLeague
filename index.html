@@ -3,11 +3,72 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Kings County Softball League — schedules, scores, standings, teams, and fields." />
-    <title>Kings County Softball League</title>
+
+    <title>Kings County Softball League — Schedules, Scores &amp; Standings</title>
+    <meta
+      name="description"
+      content="Official site of the Kings County Softball League in Brooklyn, NY. Game schedules, scores, standings, team rosters, field locations and league rules."
+    />
+
+    <!-- Canonical is rewritten per route at runtime (src/hooks/usePageMeta.js).
+         This one covers the home page and any crawler that doesn't run JS. -->
+    <link rel="canonical" href="https://kings-county-softball-league.vercel.app/" />
+
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content="#0d1b2a" />
+
+    <!-- Social previews. Facebook, iMessage, WhatsApp and Slack do NOT execute
+         JavaScript, so these have to be static — a runtime hook is too late. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Kings County Softball League" />
+    <meta property="og:title" content="Kings County Softball League" />
+    <meta
+      property="og:description"
+      content="Schedules, scores, standings, rosters and field locations for the Kings County Softball League in Brooklyn, NY."
+    />
+    <meta property="og:url" content="https://kings-county-softball-league.vercel.app/" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Kings County Softball League" />
+    <meta
+      name="twitter:description"
+      content="Schedules, scores, standings, rosters and field locations for the Kings County Softball League in Brooklyn, NY."
+    />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <!-- Tells Google what kind of thing this site is, which helps it show the
+         league name and location rather than a bare URL. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SportsOrganization",
+        "name": "Kings County Softball League",
+        "alternateName": "KCSL",
+        "sport": "Softball",
+        "url": "https://kings-county-softball-league.vercel.app/",
+        "areaServed": {
+          "@type": "Place",
+          "name": "Brooklyn, New York"
+        }
+      }
+    </script>
+
+    <script type="module" crossorigin src="/src/main.jsx"></script>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+
+    <!-- Google renders JavaScript, but Bing and most link scrapers are far less
+         reliable at it. This gives them something real, and tells a human with
+         JS disabled what the site is. -->
+    <noscript>
+      <h1>Kings County Softball League</h1>
+      <p>
+        Schedules, scores, standings, team rosters, field locations and league
+        rules for the Kings County Softball League in Brooklyn, New York.
+      </p>
+      <p>This site needs JavaScript enabled to show live schedules and standings.</p>
+    </noscript>
   </body>
 </html>

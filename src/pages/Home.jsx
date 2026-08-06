@@ -7,6 +7,7 @@ import Spinner, { ErrorState, EmptyState } from '../components/ui/Spinner.jsx'
 import { formatDateLong, parseLocalDate } from '../lib/format.js'
 import { LEAGUE } from '../lib/constants.js'
 import styles from './Home.module.css'
+import { usePageMeta } from '../hooks/usePageMeta.js'
 
 /**
  * The landing page is league news: every published announcement, in full.
@@ -16,6 +17,11 @@ import styles from './Home.module.css'
  * needs people to see when they arrive.
  */
 export default function Home() {
+  usePageMeta({
+    title: 'League news, notices and announcements',
+    description:
+      'Announcements, rainouts, playoff information and league notices for the Kings County Softball League in Brooklyn, NY.',
+  })
   const { data, loading, error, refetch } = useQueries({
     announcements: getActiveAnnouncements,
     upcoming: () => getUpcomingGames(60),

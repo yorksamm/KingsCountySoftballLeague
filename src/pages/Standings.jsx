@@ -8,6 +8,7 @@ import Spinner, { ErrorState, EmptyState } from '../components/ui/Spinner.jsx'
 import Button from '../components/ui/Button.jsx'
 import styles from '../styles/page.module.css'
 import standingsStyles from './Standings.module.css'
+import { usePageMeta } from '../hooks/usePageMeta.js'
 
 const COLUMNS = [
   { key: 'won',  label: 'W',    title: 'Won' },
@@ -21,6 +22,11 @@ const COLUMNS = [
 ]
 
 export default function Standings() {
+  usePageMeta({
+    title: 'Standings',
+    description:
+      'Kings County Softball League standings by division — wins, losses, ties, win percentage, games behind and run differential.',
+  })
   const [params, setParams] = useSearchParams()
   const division = params.get('division') ?? ''
 

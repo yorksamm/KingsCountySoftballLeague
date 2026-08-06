@@ -8,8 +8,14 @@ import ScheduleKey from '../components/games/ScheduleKey.jsx'
 import Spinner, { ErrorState, EmptyState } from '../components/ui/Spinner.jsx'
 import styles from '../styles/page.module.css'
 import upcomingStyles from './Upcoming.module.css'
+import { usePageMeta } from '../hooks/usePageMeta.js'
 
 export default function Upcoming() {
+  usePageMeta({
+    title: 'Upcoming Games',
+    description:
+      'Upcoming Kings County Softball League games — dates, start times, fields and matchups across all divisions.',
+  })
   /** Upcoming games only. Past results live on the Schedule page. */
   const { data, loading, error, refetch } = useQuery(() => getUpcomingGames(60), [])
 

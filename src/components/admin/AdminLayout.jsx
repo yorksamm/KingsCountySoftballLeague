@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext.jsx'
 import { signOut } from '../../lib/adminApi.js'
 import { LEAGUE } from '../../lib/constants.js'
 import styles from './AdminLayout.module.css'
+import { usePageMeta } from '../../hooks/usePageMeta.js'
 
 const NAV = [
   { to: '/admin/results',       label: 'Game Results', hint: 'Enter scores' },
@@ -17,6 +18,9 @@ const NAV = [
 ]
 
 export default function AdminLayout() {
+  // The admin panel must never appear in search results. robots.txt asks
+  // crawlers not to fetch /admin; this tells any that do anyway not to index.
+  usePageMeta({ title: 'League Admin', noindex: true })
   const { user } = useAuth()
   const navigate = useNavigate()
   const [navOpen, setNavOpen] = useState(false)

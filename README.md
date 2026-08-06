@@ -83,6 +83,35 @@ npm run build
 npx vercel --prod
 ```
 
+### 7. Search engines
+
+`vercel.json` is **required**, not optional. Without its rewrite, Vercel looks
+for a real file at `/schedule` and returns 404 — only `/` works. That breaks
+refreshing, bookmarking and sharing any page other than the home page, and it
+means Google has nothing to index.
+
+Also shipped: `public/robots.txt`, `public/sitemap.xml`, per-page titles and
+descriptions (`src/hooks/usePageMeta.js`), canonical URLs, Open Graph tags for
+link previews, and `noindex` on `/admin`.
+
+**Google will not find the site on its own quickly.** Do this once:
+
+1. [Google Search Console](https://search.google.com/search-console) → add a
+   **URL prefix** property for your full site URL.
+2. Verify by **HTML tag** — paste the `<meta name="google-site-verification" …>`
+   into `index.html`'s `<head>`, redeploy, then click Verify.
+3. **Sitemaps** → submit `sitemap.xml`.
+4. **URL Inspection** → paste your home page URL → **Request Indexing**. Repeat
+   for `/schedule`, `/standings` and `/teams`. This is the part that turns weeks
+   into days.
+
+Bing has the same flow at [Bing Webmaster Tools](https://www.bing.com/webmasters),
+and it can import everything from Search Console in one click.
+
+**Moving to a custom domain?** Update the hostname in `public/robots.txt` and
+`public/sitemap.xml`, set `VITE_SITE_URL` in Vercel's environment variables, and
+add the new domain as its own Search Console property.
+
 ---
 
 ## Security, in one paragraph

@@ -10,8 +10,14 @@ import Button from '../components/ui/Button.jsx'
 import Modal from '../components/ui/Modal.jsx'
 import styles from '../styles/page.module.css'
 import teamStyles from './Teams.module.css'
+import { usePageMeta } from '../hooks/usePageMeta.js'
 
 export default function Teams() {
+  usePageMeta({
+    title: 'Teams & Rosters',
+    description:
+      'Every team in the Kings County Softball League with current records, jersey numbers and full player rosters.',
+  })
   const [params, setParams] = useSearchParams()
   const division = params.get('division') ?? ''
 

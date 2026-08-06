@@ -5,8 +5,12 @@ import { signIn } from '../../lib/adminApi.js'
 import { LEAGUE } from '../../lib/constants.js'
 import Button from '../../components/ui/Button.jsx'
 import styles from './AdminLogin.module.css'
+import { usePageMeta } from '../../hooks/usePageMeta.js'
 
 export default function AdminLogin() {
+  // The admin panel must never appear in search results. robots.txt asks
+  // crawlers not to fetch /admin; this tells any that do anyway not to index.
+  usePageMeta({ title: 'League Admin', noindex: true })
   const { session, loading } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()

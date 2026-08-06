@@ -10,8 +10,14 @@ import Spinner, { ErrorState, EmptyState } from '../components/ui/Spinner.jsx'
 import Button from '../components/ui/Button.jsx'
 import { formatDateLong } from '../lib/format.js'
 import styles from '../styles/page.module.css'
+import { usePageMeta } from '../hooks/usePageMeta.js'
 
 export default function Schedule() {
+  usePageMeta({
+    title: 'Schedule & Scores',
+    description:
+      'Full Kings County Softball League season schedule and results, filterable by division, team and status. Scores are Visitor – Home.',
+  })
   // Filters live in the URL so a filtered view can be linked or bookmarked.
   const [params, setParams] = useSearchParams()
   const division = params.get('division') ?? ''

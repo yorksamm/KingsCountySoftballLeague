@@ -4,8 +4,14 @@ import Spinner, { ErrorState, EmptyState } from '../components/ui/Spinner.jsx'
 import { LEAGUE } from '../lib/constants.js'
 import styles from '../styles/page.module.css'
 import rulesStyles from './Rules.module.css'
+import { usePageMeta } from '../hooks/usePageMeta.js'
 
 export default function Rules() {
+  usePageMeta({
+    title: 'League Rules',
+    description:
+      'The official Kings County Softball League rulebook.',
+  })
   const { data, loading, error, refetch } = useQuery(getRulesDocument, [])
 
   return (

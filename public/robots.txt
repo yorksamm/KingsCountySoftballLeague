@@ -1,0 +1,10 @@
+# Kings County Softball League
+# Everything public is crawlable. The admin panel is not — it is useless to a
+# search engine and should never appear in results.
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+
+Sitemap: https://kings-county-softball-league.vercel.app/sitemap.xml
