@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { getActiveAnnouncements, getUpcomingGames } from '../lib/api.js'
 import { useQueries } from '../hooks/useQuery.js'
 import RichText from '../lib/richText.jsx'
+import RichDoc from '../lib/richDoc.jsx'
 import Spinner, { ErrorState, EmptyState } from '../components/ui/Spinner.jsx'
 import { formatDateLong, parseLocalDate } from '../lib/format.js'
 import { LEAGUE } from '../lib/constants.js'
@@ -91,7 +92,12 @@ export default function Home() {
                   )}
                 </header>
 
-                <RichText text={post.body} />
+                {/* Announcements written in the WYSIWYG editor carry a
+                    structured document. Anything published before that keeps
+                    rendering from its original text. */}
+                {post.body_doc
+                  ? <RichDoc doc={post.body_doc} />
+                  : <RichText text={post.body} />}
               </article>
             )
           })}

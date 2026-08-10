@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { getActiveAnnouncements } from '../../lib/api.js'
 import { firstParagraph } from '../../lib/richText.jsx'
+import { docFirstParagraph } from '../../lib/richDoc.jsx'
 import { LEAGUE } from '../../lib/constants.js'
 import { isConfigured } from '../../lib/supabase.js'
 import styles from './PublicLayout.module.css'
@@ -82,10 +83,14 @@ function AnnouncementBanner() {
         <div className={styles.bannerText}>
           <span className={styles.pin} title="Pinned">★</span>
           <strong className={styles.bannerTitle}>{announcement.title}</strong>
-          {announcement.body && (
+          {(announcement.body_doc || announcement.body) && (
             // Lead paragraph only — the banner is a one-line strip and the
             // full post is on the home page behind "Read more".
-            <span className={styles.bannerBody}>{firstParagraph(announcement.body, 200)}</span>
+            <span className={styles.bannerBody}>
+              {announcement.body_doc
+                ? docFirstParagraph(announcement.body_doc, 200)
+                : firstParagraph(announcement.body, 200)}
+            </span>
           )}
           <NavLink to="/" className={styles.bannerMore}>Read more</NavLink>
         </div>

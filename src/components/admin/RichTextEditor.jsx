@@ -1,100 +1,145 @@
-import { useRef, useState } from 'react'
-import RichText, { TEXT_COLORS } from '../../lib/richText.jsx'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { TEXT_COLORS } from '../../lib/richText.jsx'
+import { domToDoc, docToDom, COLOR_TO_HEX, isEmptyDoc } from '../../lib/richDoc.jsx'
 import styles from './RichTextEditor.module.css'
 
 /**
- * Textarea plus formatting buttons and a live preview.
+ * WYSIWYG editor for announcements. What the admin sees in the box is what the
+ * home page publishes — no markers, no preview pane to compare against.
  *
- * The buttons exist because the people writing these notices are league
- * volunteers, not markdown users. Nobody should have to know that `##` makes a
- * heading — they select some text, press **Heading**, and see the result
- * underneath. The syntax is still there for anyone who wants to type it.
+ * WHY execCommand, given it's deprecated: toggling is the whole point of this
+ * rewrite. Pressing Bold on already-bold text has to UNBOLD it, and doing that
+ * by hand means reimplementing selection splitting, partial-selection state,
+ * undo integration and Cmd+B — badly. execCommand gets all of that from the
+ * browser, works everywhere today, and has no announced removal date. The
+ * output is messy, but nothing about that matters because we never store its
+ * HTML: domToDoc() reduces the DOM to a restricted JSON document on every
+ * change, which is also what keeps a pasted <script> from ever being saved.
  */
 
-/** Wraps the selection, or inserts placeholder text if nothing is selected. */
-function wrapSelection(el, before, after, placeholder) {
-  const start = el.selectionStart
-  const end = el.selectionEnd
-  const selected = el.value.slice(start, end) || placeholder
-  const next = el.value.slice(0, start) + before + selected + after + el.value.slice(end)
-  return { next, cursor: [start + before.length, start + before.length + selected.length] }
-}
-
-/** Adds a prefix to the start of every selected line (headings, lists). */
-function prefixLines(el, prefix, placeholder) {
-  const value = el.value
-  const start = el.selectionStart
-  const end = el.selectionEnd
-
-  const lineStart = value.lastIndexOf('\n', start - 1) + 1
-  const lineEnd = value.indexOf('\n', end) === -1 ? value.length : value.indexOf('\n', end)
-
-  const block = value.slice(lineStart, lineEnd) || placeholder
-  const prefixed = block
-    .split('\n')
-    .map((line, i) => {
-      // Numbered lists count up; everything else repeats the same marker.
-      const mark = prefix === '1. ' ? `${i + 1}. ` : prefix
-      return line.startsWith(mark) ? line : mark + line
-    })
-    .join('\n')
-
-  // A heading or list needs a blank line above it to start a new block.
-  const needsGap = lineStart > 0 && value[lineStart - 1] !== '\n'
-  const gap = needsGap ? '\n' : ''
-
-  const next = value.slice(0, lineStart) + gap + prefixed + value.slice(lineEnd)
-  const from = lineStart + gap.length
-  return { next, cursor: [from, from + prefixed.length] }
-}
+const BLOCK_TAG = { p: 'P', h1: 'H3', h2: 'H4' }
 
 export default function RichTextEditor({ value, onChange, id, placeholder }) {
   const ref = useRef(null)
-  const [showHelp, setShowHelp] = useState(false)
+  const [active, setActive] = useState({})
+  // Set while we're writing the caller's value in, so the resulting DOM
+  // mutations don't echo straight back out as a change.
+  const loading = useRef(false)
+  // The doc we last emitted, to avoid clobbering the caret by reloading our
+  // own output on the next render.
+  const lastEmitted = useRef(null)
 
-  const apply = (fn) => {
+  /* --- load the document into the box ------------------------------------ */
+  useEffect(() => {
     const el = ref.current
     if (!el) return
-    const { next, cursor } = fn(el)
-    onChange(next)
-    // Restore the selection after React re-renders the textarea.
-    requestAnimationFrame(() => {
-      el.focus()
-      el.setSelectionRange(cursor[0], cursor[1])
+    if (lastEmitted.current && JSON.stringify(value) === lastEmitted.current) return
+
+    loading.current = true
+    el.replaceChildren(docToDom(value, document))
+    loading.current = false
+  }, [value])
+
+  /* --- read the box back out --------------------------------------------- */
+  const emit = useCallback(() => {
+    const el = ref.current
+    if (!el || loading.current) return
+    const doc = domToDoc(el)
+    lastEmitted.current = JSON.stringify(doc)
+    onChange(doc)
+  }, [onChange])
+
+  /* --- which buttons should look pressed --------------------------------- */
+  const refreshActive = useCallback(() => {
+    const el = ref.current
+    if (!el || !el.contains(document.getSelection()?.anchorNode ?? null)) return
+    const q = (cmd) => { try { return document.queryCommandState(cmd) } catch { return false } }
+    let block = ''
+    try { block = (document.queryCommandValue('formatBlock') || '').toUpperCase() } catch { /* unsupported */ }
+    setActive({
+      bold: q('bold'),
+      italic: q('italic'),
+      underline: q('underline'),
+      ul: q('insertUnorderedList'),
+      ol: q('insertOrderedList'),
+      h1: block === 'H3',
+      h2: block === 'H4',
     })
+  }, [])
+
+  useEffect(() => {
+    document.addEventListener('selectionchange', refreshActive)
+    return () => document.removeEventListener('selectionchange', refreshActive)
+  }, [refreshActive])
+
+  /* --- commands ----------------------------------------------------------- */
+  const run = (cmd, arg) => {
+    const el = ref.current
+    if (!el) return
+    el.focus()
+    // Inline styles rather than <font> tags — easier to read back reliably.
+    try { document.execCommand('styleWithCSS', false, true) } catch { /* older engines */ }
+    document.execCommand(cmd, false, arg)
+    emit()
+    refreshActive()
   }
 
-  const TOOLS = [
-    { label: 'Heading',   title: 'Big heading',      run: (el) => prefixLines(el, '# ', 'Heading') },
-    { label: 'Subhead',   title: 'Smaller heading',  run: (el) => prefixLines(el, '## ', 'Subheading') },
-    { label: 'B',         title: 'Bold',      className: styles.bold,      run: (el) => wrapSelection(el, '**', '**', 'bold text') },
-    { label: 'I',         title: 'Italic',    className: styles.italic,    run: (el) => wrapSelection(el, '*', '*', 'italic text') },
-    { label: 'U',         title: 'Underline', className: styles.underline, run: (el) => wrapSelection(el, '++', '++', 'underlined text') },
-    { label: '• List',    title: 'Bulleted list',    run: (el) => prefixLines(el, '- ', 'List item') },
-    { label: '1. List',   title: 'Numbered list',    run: (el) => prefixLines(el, '1. ', 'First item') },
-    { label: 'Link',      title: 'Link',             run: (el) => wrapSelection(el, '[', '](https://)', 'link text') },
-    { label: '— Divider', title: 'Horizontal divider', run: (el) => prefixLines(el, '', '\n---\n') },
-  ]
+  const toggleBlock = (type) => {
+    const isOn = active[type]
+    run('formatBlock', isOn ? 'P' : BLOCK_TAG[type])
+  }
+
+  /**
+   * Paste as plain text. Keeps pasted Word/webpage markup — and anything
+   * hostile in it — out of the box entirely, rather than relying on domToDoc
+   * to strip it afterwards.
+   */
+  const onPaste = (e) => {
+    e.preventDefault()
+    const text = e.clipboardData.getData('text/plain')
+    document.execCommand('insertText', false, text)
+    emit()
+  }
+
+  const showPlaceholder = isEmptyDoc(value)
+
+  const Btn = ({ cmd, label, title, className, on }) => (
+    <button
+      type="button"
+      title={title}
+      aria-label={title}
+      aria-pressed={Boolean(on)}
+      className={[styles.tool, className, on ? styles.toolOn : ''].filter(Boolean).join(' ')}
+      onMouseDown={(e) => e.preventDefault()}   // keep the selection alive
+      onClick={cmd}
+    >
+      {label}
+    </button>
+  )
 
   return (
     <div className={styles.editor}>
       <div className={styles.toolbar} role="toolbar" aria-label="Text formatting">
-        {TOOLS.map((tool) => (
-          <button
-            key={tool.label}
-            type="button"
-            title={tool.title}
-            aria-label={tool.title}
-            className={[styles.tool, tool.className].filter(Boolean).join(' ')}
-            // Keeps the textarea selection alive when the button is pressed.
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => apply(tool.run)}
-          >
-            {tool.label}
-          </button>
-        ))}
-        {/* Fixed palette rather than a colour picker — see TEXT_COLORS in
-            lib/richText.jsx for why. Each swatch wraps the selection. */}
+        <Btn title="Big heading" label="Heading" on={active.h1} cmd={() => toggleBlock('h1')} />
+        <Btn title="Smaller heading" label="Subhead" on={active.h2} cmd={() => toggleBlock('h2')} />
+
+        <Btn title="Bold" label="B" className={styles.bold} on={active.bold} cmd={() => run('bold')} />
+        <Btn title="Italic" label="I" className={styles.italic} on={active.italic} cmd={() => run('italic')} />
+        <Btn title="Underline" label="U" className={styles.underlineBtn} on={active.underline} cmd={() => run('underline')} />
+
+        <Btn title="Bulleted list" label="• List" on={active.ul} cmd={() => run('insertUnorderedList')} />
+        <Btn title="Numbered list" label="1. List" on={active.ol} cmd={() => run('insertOrderedList')} />
+
+        <Btn
+          title="Add a link"
+          label="Link"
+          cmd={() => {
+            const url = window.prompt('Link address (https://…)')
+            if (url) run('createLink', url)
+          }}
+        />
+        <Btn title="Remove link" label="Unlink" cmd={() => run('unlink')} />
+
         <span className={styles.swatches} role="group" aria-label="Text colour">
           {Object.entries(TEXT_COLORS).map(([name, meta]) => (
             <button
@@ -104,57 +149,48 @@ export default function RichTextEditor({ value, onChange, id, placeholder }) {
               aria-label={`Colour text ${meta.label}`}
               className={`${styles.swatch} ${styles[`sw_${name}`]}`}
               onMouseDown={(e) => e.preventDefault()}
-              onClick={() => apply((el) => wrapSelection(el, `{${name}:`, '}', `${meta.label.toLowerCase()} text`))}
+              onClick={() => run('foreColor', COLOR_TO_HEX[name])}
             />
           ))}
+          <button
+            type="button"
+            title="Back to normal text colour"
+            aria-label="Remove colour"
+            className={`${styles.swatch} ${styles.swatchNone}`}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => run('foreColor', '#16202b')}
+          />
         </span>
 
-        <button
-          type="button"
-          className={styles.helpToggle}
-          onClick={() => setShowHelp((v) => !v)}
-          aria-expanded={showHelp}
-        >
-          {showHelp ? 'Hide' : 'Formatting help'}
-        </button>
+        <span className={styles.spacer} />
+        <Btn title="Undo" label="↶" cmd={() => run('undo')} />
+        <Btn title="Redo" label="↷" cmd={() => run('redo')} />
       </div>
 
-      {showHelp && (
-        <dl className={styles.help}>
-          <div><dt># Heading</dt><dd>A big heading on its own line</dd></div>
-          <div><dt>## Subheading</dt><dd>A smaller heading</dd></div>
-          <div><dt>**bold**</dt><dd>Bold text</dd></div>
-          <div><dt>*italic*</dt><dd>Italic text</dd></div>
-          <div><dt>++underline++</dt><dd>Underlined text</dd></div>
-          {/* Braces are literal text here, so they must be a string — bare
-              {red:text} would be parsed as a JSX expression. */}
-          <div><dt>{'{red:text}'}</dt><dd>Coloured text — red, green, blue, orange or gray</dd></div>
-          <div><dt>- item</dt><dd>A bullet point</dd></div>
-          <div><dt>1. item</dt><dd>A numbered point</dd></div>
-          <div><dt>[Rules](https://…)</dt><dd>A link</dd></div>
-          <div><dt>---</dt><dd>A divider line</dd></div>
-          <div><dt>(blank line)</dt><dd>Starts a new paragraph</dd></div>
-        </dl>
-      )}
-
-      <textarea
-        id={id}
-        ref={ref}
-        className={styles.textarea}
-        value={value}
-        placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value)}
-        rows={14}
-      />
-
-      <div className={styles.previewWrap}>
-        <span className={styles.previewLabel}>Preview — how this will look on the home page</span>
-        <div className={styles.preview}>
-          {value.trim()
-            ? <RichText text={value} />
-            : <p className={styles.previewEmpty}>Nothing to preview yet.</p>}
-        </div>
+      <div className={styles.surfaceWrap}>
+        {showPlaceholder && placeholder && (
+          <div className={styles.placeholder} aria-hidden="true">{placeholder}</div>
+        )}
+        <div
+          id={id}
+          ref={ref}
+          className={styles.surface}
+          contentEditable
+          suppressContentEditableWarning
+          role="textbox"
+          aria-multiline="true"
+          aria-label="Announcement body"
+          onInput={emit}
+          onBlur={emit}
+          onPaste={onPaste}
+          onKeyUp={refreshActive}
+          onMouseUp={refreshActive}
+        />
       </div>
+
+      <p className={styles.footNote}>
+        This is exactly how the announcement will look on the home page.
+      </p>
     </div>
   )
 }

@@ -108,7 +108,7 @@ export async function getActiveAnnouncements() {
   return unwrap(
     await supabase
       .from('announcements')
-      .select('id, title, body, active, pinned, created_at')
+      .select('id, title, body, body_doc, active, pinned, created_at')
       .eq('active', true)
       .order('pinned', { ascending: false })
       .order('created_at', { ascending: false })

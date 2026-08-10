@@ -145,6 +145,43 @@ function renderInline(text, keyPrefix, depth = 0) {
     })
 }
 
+/**
+ * Same grammar as renderInline, but produces flat styled runs instead of React
+ * elements — the bridge that lets an announcement written in the old marker
+ * syntax be opened in the WYSIWYG editor (see lib/richDoc.jsx).
+ *
+ * @returns {{text:string,b?:boolean,i?:boolean,u?:boolean,c?:string,href?:string}[]}
+ */
+export function parseInlineRuns(text, marks = {}, depth = 0) {
+  const out = []
+  const push = (inner, extra) => {
+    const nested = depth < MAX_DEPTH
+      ? parseInlineRuns(inner, { ...marks, ...extra }, depth + 1)
+      : [{ text: inner, ...marks, ...extra }]
+    out.push(...nested)
+  }
+
+  for (const part of String(text ?? '').split(INLINE)) {
+    if (part === '' || part == null) continue
+    let m
+
+    if ((m = RE_COLOR.exec(part))) { push(m[2], { c: m[1] }); continue }
+    if ((m = RE_UNDERLINE.exec(part))) { push(m[1], { u: true }); continue }
+    if ((m = RE_BOLD.exec(part))) { push(m[1], { b: true }); continue }
+    if ((m = RE_ITALIC.exec(part))) { push(m[1], { i: true }); continue }
+
+    if ((m = /^\[([^\]\n]+)\]\(([^)\s]+)\)$/.exec(part))) {
+      const href = safeHref(m[2])
+      out.push(href ? { text: m[1], ...marks, href } : { text: m[1], ...marks })
+      continue
+    }
+
+    out.push({ text: part, ...marks })
+  }
+
+  return out.filter((run) => run.text !== '')
+}
+
 const RE_HEADING = /^(#{1,3})\s+(.*)$/
 const RE_HR = /^\s*(-{3,}|\*{3,}|_{3,})\s*$/
 const RE_UL = /^\s*[-*+]\s+(.*)$/
