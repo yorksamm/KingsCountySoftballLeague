@@ -47,3 +47,27 @@
   border: none;
   border-top: 1px solid var(--line);
 }
+
+/* Author-chosen text colours ----------------------------------------------
+   A fixed palette, all verified at WCAG AA or better against the white
+   announcement card (lowest is red at 6.3:1). If you add one, check its
+   contrast — an unreadable league notice is worse than a plain one. */
+.c_red    { color: var(--loss); }
+.c_green  { color: var(--turf-dark); }
+.c_blue   { color: var(--navy-600); }
+.c_orange { color: var(--clay-dark); }
+.c_gray   { color: var(--ink-soft); }
+
+.prose .c_red,
+.prose .c_green,
+.prose .c_blue,
+.prose .c_orange,
+.prose .c_gray { font-weight: 600; }
+
+/* Underlined text is easily mistaken for a link, so it gets a slightly offset
+   underline that reads as emphasis rather than something clickable. */
+.underline {
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}

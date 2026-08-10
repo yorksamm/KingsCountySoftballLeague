@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import RichText from '../../lib/richText.jsx'
+import RichText, { TEXT_COLORS } from '../../lib/richText.jsx'
 import styles from './RichTextEditor.module.css'
 
 /**
@@ -67,8 +67,9 @@ export default function RichTextEditor({ value, onChange, id, placeholder }) {
   const TOOLS = [
     { label: 'Heading',   title: 'Big heading',      run: (el) => prefixLines(el, '# ', 'Heading') },
     { label: 'Subhead',   title: 'Smaller heading',  run: (el) => prefixLines(el, '## ', 'Subheading') },
-    { label: 'B',         title: 'Bold',   className: styles.bold,   run: (el) => wrapSelection(el, '**', '**', 'bold text') },
-    { label: 'I',         title: 'Italic', className: styles.italic, run: (el) => wrapSelection(el, '*', '*', 'italic text') },
+    { label: 'B',         title: 'Bold',      className: styles.bold,      run: (el) => wrapSelection(el, '**', '**', 'bold text') },
+    { label: 'I',         title: 'Italic',    className: styles.italic,    run: (el) => wrapSelection(el, '*', '*', 'italic text') },
+    { label: 'U',         title: 'Underline', className: styles.underline, run: (el) => wrapSelection(el, '++', '++', 'underlined text') },
     { label: '• List',    title: 'Bulleted list',    run: (el) => prefixLines(el, '- ', 'List item') },
     { label: '1. List',   title: 'Numbered list',    run: (el) => prefixLines(el, '1. ', 'First item') },
     { label: 'Link',      title: 'Link',             run: (el) => wrapSelection(el, '[', '](https://)', 'link text') },
@@ -92,6 +93,22 @@ export default function RichTextEditor({ value, onChange, id, placeholder }) {
             {tool.label}
           </button>
         ))}
+        {/* Fixed palette rather than a colour picker — see TEXT_COLORS in
+            lib/richText.jsx for why. Each swatch wraps the selection. */}
+        <span className={styles.swatches} role="group" aria-label="Text colour">
+          {Object.entries(TEXT_COLORS).map(([name, meta]) => (
+            <button
+              key={name}
+              type="button"
+              title={`${meta.label} — ${meta.hint}`}
+              aria-label={`Colour text ${meta.label}`}
+              className={`${styles.swatch} ${styles[`sw_${name}`]}`}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => apply((el) => wrapSelection(el, `{${name}:`, '}', `${meta.label.toLowerCase()} text`))}
+            />
+          ))}
+        </span>
+
         <button
           type="button"
           className={styles.helpToggle}
@@ -108,6 +125,10 @@ export default function RichTextEditor({ value, onChange, id, placeholder }) {
           <div><dt>## Subheading</dt><dd>A smaller heading</dd></div>
           <div><dt>**bold**</dt><dd>Bold text</dd></div>
           <div><dt>*italic*</dt><dd>Italic text</dd></div>
+          <div><dt>++underline++</dt><dd>Underlined text</dd></div>
+          {/* Braces are literal text here, so they must be a string — bare
+              {red:text} would be parsed as a JSX expression. */}
+          <div><dt>{'{red:text}'}</dt><dd>Coloured text — red, green, blue, orange or gray</dd></div>
           <div><dt>- item</dt><dd>A bullet point</dd></div>
           <div><dt>1. item</dt><dd>A numbered point</dd></div>
           <div><dt>[Rules](https://…)</dt><dd>A link</dd></div>

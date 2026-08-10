@@ -224,9 +224,16 @@ Two switches control where an announcement appears:
 #### Formatting, without a markdown library
 
 Announcement bodies support headings, bullet and numbered lists, bold, italic,
-links and dividers. The admin editor has toolbar buttons for all of it plus a
+**underline** (`++text++`), **text colour** (`{red:text}`), links and dividers. The admin editor has toolbar buttons for all of it plus a
 live preview, so nobody has to learn the syntax — but the syntax is there for
 anyone who wants it (`## Heading`, `- bullet`, `**bold**`, `[text](url)`, `---`).
+
+Colour is a **fixed five-colour palette** — red, green, blue, orange, gray —
+not a colour picker. A free picker invites pale yellow on white, and a league
+notice is the one place text has to stay readable. Every colour is verified at
+WCAG AA or better against the white card (lowest is red at 6.3:1). Add one only
+after checking its contrast. Colour and underline nest with each other and with
+bold, so `{red:++urgent++}` works.
 
 **This is deliberately not a markdown library.** Every markdown package
 ultimately hands you an HTML string, which means `dangerouslySetInnerHTML`, and
