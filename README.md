@@ -232,8 +232,9 @@ Colour is a **fixed five-colour palette** — red, green, blue, orange, gray —
 not a colour picker. A free picker invites pale yellow on white, and a league
 notice is the one place text has to stay readable. Every colour is verified at
 WCAG AA or better against the white card (lowest is red at 6.3:1). Add one only
-after checking its contrast. Colour and underline nest with each other and with
-bold, so `{red:++urgent++}` works.
+after checking its contrast. All four inline formats — bold, italic, underline, colour — nest freely in any
+order, so `**{red:bold red}**`, `{green:**++all three++**}` and
+`**bold with *italic* in**` all render as you'd expect.
 
 **This is deliberately not a markdown library.** Every markdown package
 ultimately hands you an HTML string, which means `dangerouslySetInnerHTML`, and

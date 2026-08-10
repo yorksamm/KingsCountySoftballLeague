@@ -56,13 +56,22 @@ export const TEXT_COLORS = {
 
 const COLOR_NAMES = Object.keys(TEXT_COLORS).join('|')
 
+/*
+ * Bold has to be able to contain a lone `*` so `**bold with *italic* in**`
+ * matches at all — `[^*\n]+` made bold fail on that input and italic then
+ * grabbed the wrong spans. `\*(?!\*)` allows a single star but never `**`,
+ * which is what stops the greedy repeat running past the closing delimiter:
+ * in `**one** and **two**` the repeat cannot swallow the `**` after `one`.
+ */
+const BOLD_INNER = '(?:[^*\\n]|\\*(?!\\*))+'
+
 // Split on the inline markers while keeping the delimiters. Order matters:
 // ** before *, so bold isn't eaten by italic.
 const INLINE = new RegExp(
   '(' +
   `\\{(?:${COLOR_NAMES}):[^{}\\n]+\\}` + '|' +   // {red:coloured}
   '\\+\\+[^\\n]+?\\+\\+' + '|' +                  // ++underlined++
-  '\\*\\*[^*\\n]+\\*\\*' + '|' +                  // **bold**
+  `\\*\\*${BOLD_INNER}\\*\\*` + '|' +             // **bold**
   '\\*[^*\\n]+\\*' + '|' +                        // *italic*
   '\\[[^\\]\\n]+\\]\\([^)\\s]+\\)' +              // [text](url)
   ')',
@@ -71,12 +80,28 @@ const INLINE = new RegExp(
 
 const RE_COLOR = new RegExp(`^\\{(${COLOR_NAMES}):([^{}\\n]+)\\}$`)
 const RE_UNDERLINE = /^\+\+([^\n]+?)\+\+$/
+const RE_BOLD = new RegExp(`^\\*\\*(${BOLD_INNER})\\*\\*$`)
+const RE_ITALIC = /^\*([^*\n]+)\*$/
 
 /**
- * @param {number} depth guards against a pathological nest; content shrinks on
- *                       every recursion so this is belt-and-braces only.
+ * Deep enough for every sane combination (colour > bold > underline > italic)
+ * with room to spare. Content strictly shrinks on each recursion — every
+ * wrapper strips at least two characters per side — so runaway recursion is
+ * impossible and this is only a backstop.
  */
+const MAX_DEPTH = 6
+
 function renderInline(text, keyPrefix, depth = 0) {
+  /**
+   * Render a wrapper's contents. EVERY format recurses through this — bold and
+   * italic used to return their inner text raw, which meant whichever format
+   * was on the outside won and anything inside bold or italic stayed literal
+   * (`**{red:x}**` printed the braces). At max depth we still strip the
+   * markers rather than leaking them into the page.
+   */
+  const kids = (inner, suffix) =>
+    depth < MAX_DEPTH ? renderInline(inner, `${keyPrefix}${suffix}`, depth + 1) : inner
+
   return String(text)
     .split(INLINE)
     .filter((part) => part !== '' && part != null)
@@ -84,26 +109,22 @@ function renderInline(text, keyPrefix, depth = 0) {
       const key = `${keyPrefix}i${i}`
       let m
 
-      // Colour and underline recurse, so {red:**bold and red**} works. Bold and
-      // italic deliberately do not nest — their delimiters overlap and the
-      // ambiguity isn't worth it for a league notice.
-      if (depth < 4 && (m = RE_COLOR.exec(part))) {
+      if ((m = RE_COLOR.exec(part))) {
         return (
           <span key={key} className={styles[`c_${m[1]}`]}>
-            {renderInline(m[2], `${key}c`, depth + 1)}
+            {kids(m[2], `${i}c`)}
           </span>
         )
       }
-      if (depth < 4 && (m = RE_UNDERLINE.exec(part))) {
-        return (
-          <u key={key} className={styles.underline}>
-            {renderInline(m[1], `${key}u`, depth + 1)}
-          </u>
-        )
+      if ((m = RE_UNDERLINE.exec(part))) {
+        return <u key={key} className={styles.underline}>{kids(m[1], `${i}u`)}</u>
       }
-
-      if ((m = /^\*\*([^*\n]+)\*\*$/.exec(part))) return <strong key={key}>{m[1]}</strong>
-      if ((m = /^\*([^*\n]+)\*$/.exec(part))) return <em key={key}>{m[1]}</em>
+      if ((m = RE_BOLD.exec(part))) {
+        return <strong key={key}>{kids(m[1], `${i}b`)}</strong>
+      }
+      if ((m = RE_ITALIC.exec(part))) {
+        return <em key={key}>{kids(m[1], `${i}e`)}</em>
+      }
 
       if ((m = /^\[([^\]\n]+)\]\(([^)\s]+)\)$/.exec(part))) {
         const href = safeHref(m[2])
