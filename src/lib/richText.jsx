@@ -1,5 +1,6 @@
 import { Fragment, useMemo } from 'react'
 import styles from './richText.module.css'
+import { TEXT_COLORS } from './palette.js'
 
 /**
  * A small, deliberately limited formatting language for announcements.
@@ -36,25 +37,11 @@ function safeHref(raw) {
   return null   // javascript:, data:, vbscript:, anything else
 }
 
-/**
- * Text colours available to announcement authors.
- *
- * A FIXED PALETTE, not a colour picker, on purpose. League notices are the one
- * place on the site where text absolutely has to stay readable, and a free
- * picker invites pale yellow on white. Every colour here is checked against the
- * white card background at WCAG AA or better (lowest is red at 6.3:1).
- *
- * Keys are what the author types: {red:like this}
- */
-export const TEXT_COLORS = {
-  red:    { label: 'Red',    hint: 'Cancellations, deadlines' },
-  green:  { label: 'Green',  hint: 'Confirmations, good news' },
-  blue:   { label: 'Blue',   hint: 'General information' },
-  orange: { label: 'Orange', hint: 'League accent colour' },
-  gray:   { label: 'Gray',   hint: 'De-emphasised, less important' },
-}
-
+// The legacy `{red:…}` syntax accepts whatever the shared palette defines, so
+// old announcements keep parsing as the palette grows. See lib/palette.js.
 const COLOR_NAMES = Object.keys(TEXT_COLORS).join('|')
+
+export { TEXT_COLORS }
 
 /*
  * Bold has to be able to contain a lone `*` so `**bold with *italic* in**`

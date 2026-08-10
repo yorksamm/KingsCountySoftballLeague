@@ -41,7 +41,27 @@ export default function Home() {
   return (
     <div className={`wrap ${styles.page}`}>
       <header className={styles.masthead}>
-        <h1 className={styles.title}>{LEAGUE.name}</h1>
+        {/* The logo already says the league's name, so repeating it as visible
+            text would just be the same words twice. The h1 stays for search
+            engines and screen readers, hidden visually. */}
+        <h1 className="visually-hidden">{LEAGUE.name}</h1>
+        {/* Not lazy-loaded: this is the largest paint on the page and sits
+            above the fold, so deferring it would only delay it. width/height
+            are set so the browser reserves the space and the page doesn't
+            jump when the file arrives.
+            `fetchpriority` is lowercase on purpose — React 18 only forwards
+            the camelCase spelling from v19 onward, and warns instead of
+            passing it through. */}
+        <img
+          className={styles.logo}
+          src="/kcsl-logo-1280.jpg"
+          srcSet="/kcsl-logo-800.jpg 800w, /kcsl-logo-1280.jpg 1280w"
+          sizes="(max-width: 760px) 100vw, 720px"
+          width="1280"
+          height="853"
+          alt="Kings County Softball League — American Softball Association. Play. Compete. Respect."
+          fetchpriority="high"
+        />
         <p className={styles.tagline}>League news, notices, and information</p>
       </header>
 

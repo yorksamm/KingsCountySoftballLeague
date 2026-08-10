@@ -83,6 +83,18 @@ npm run build
 npx vercel --prod
 ```
 
+### 7. The league logo
+
+`public/kcsl-logo-1280.jpg` and `kcsl-logo-800.jpg` are the home page banner,
+served responsively via `srcset`. They came from a 1.6 MB PNG, resized and
+converted to JPEG at 216 KB and 106 KB — a landing page should not ship 1.6 MB
+of logo. Replacing it means regenerating both sizes and keeping the `width`
+and `height` attributes in `src/pages/Home.jsx` matched to the new aspect
+ratio, or the page will jump as it loads.
+
+The same image is the Open Graph preview, so it's what appears when the site is
+shared in Messages, WhatsApp or Facebook.
+
 ### 7. Search engines
 
 > **Never put a `"comment"` key in `vercel.json`.** JSON has no comment syntax
@@ -241,8 +253,20 @@ to sanitise and no way to smuggle a tag through. An `<img>`, `<script>` or
 `onclick` simply has no representation in the model and is dropped on save.
 Pastes are inserted as plain text for the same reason.
 
-Colour remains a **fixed five-colour palette**, verified at WCAG AA or better
-against the white card (lowest is red at 6.3:1).
+**Colour: 11 text colours and 6 highlights**, all defined in one place
+(`src/lib/palette.js`) and still a fixed palette rather than a picker.
+
+Highlights are what actually make a notice pop — far more than coloured text —
+which is exactly why they're pale: every text colour has to stay legible on top
+of one. The whole grid is safe because contrast of coloured text on a tint is
+just its contrast against white divided by the tint's, so
+
+    min(text contrast) / max(highlight contrast)  =  6.47 / 1.186  =  5.46:1
+
+Every one of the 11 x 7 combinations clears WCAG AA, and every text colour
+clears AA on plain white too. **Re-check that ratio before changing any value** —
+the earlier five-colour palette failed the moment highlights were added, at
+orange on pink, 3.85:1.
 
 **Nothing published before this is lost.** Announcements written in the old
 marker syntax keep rendering from their original `body` text. The first time

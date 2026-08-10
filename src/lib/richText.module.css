@@ -48,21 +48,34 @@
   border-top: 1px solid var(--line);
 }
 
-/* Author-chosen text colours ----------------------------------------------
-   A fixed palette, all verified at WCAG AA or better against the white
-   announcement card (lowest is red at 6.3:1). If you add one, check its
-   contrast — an unreadable league notice is worse than a plain one. */
-.c_red    { color: var(--loss); }
-.c_green  { color: var(--turf-dark); }
-.c_blue   { color: var(--navy-600); }
-.c_orange { color: var(--clay-dark); }
-.c_gray   { color: var(--ink-soft); }
+/* Author-chosen colours ---------------------------------------------------
+   GENERATED FROM src/lib/palette.js — keep them in step. Every text colour
+   clears WCAG AA on white, and on every highlight, because
+   min(text contrast) / max(highlight contrast) = 6.47 / 1.186 = 5.46:1.
+   Re-check that ratio before changing any value. */
+.c_red    { color: #b02121; }
+.c_rose   { color: #a01050; }
+.c_orange { color: #9c440c; }
+.c_brown  { color: #7b4b2a; }
+.c_green  { color: #166534; }
+.c_teal   { color: #00625a; }
+.c_blue   { color: #0f4c96; }
+.c_indigo { color: #3730a3; }
+.c_purple { color: #6a1b9a; }
+.c_navy   { color: #0d2440; }
+.c_gray   { color: #465463; }
 
-.prose .c_red,
-.prose .c_green,
-.prose .c_blue,
-.prose .c_orange,
-.prose .c_gray { font-weight: 600; }
+/* Colour alone can read as accidental; a little weight makes it deliberate. */
+.prose :is(.c_red, .c_rose, .c_orange, .c_brown, .c_green, .c_teal, .c_blue, .c_indigo, .c_purple, .c_navy, .c_gray) { font-weight: 600; }
+
+/* Highlights. Pale on purpose — every text colour has to stay legible on top
+   of them, and a saturated background would fail that immediately. */
+.h_yellow { background-color: #fff7c2; color: inherit; padding: .05em .18em; border-radius: 3px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.h_green  { background-color: #ddf6e5; color: inherit; padding: .05em .18em; border-radius: 3px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.h_blue   { background-color: #e4f1fd; color: inherit; padding: .05em .18em; border-radius: 3px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.h_pink   { background-color: #fde7f0; color: inherit; padding: .05em .18em; border-radius: 3px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.h_orange { background-color: #ffeeda; color: inherit; padding: .05em .18em; border-radius: 3px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.h_purple { background-color: #f2e8fb; color: inherit; padding: .05em .18em; border-radius: 3px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
 
 /* Underlined text is easily mistaken for a link, so it gets a slightly offset
    underline that reads as emphasis rather than something clickable. */

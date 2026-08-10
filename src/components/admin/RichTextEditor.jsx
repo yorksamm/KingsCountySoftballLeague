@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { TEXT_COLORS } from '../../lib/richText.jsx'
-import { domToDoc, docToDom, COLOR_TO_HEX, isEmptyDoc } from '../../lib/richDoc.jsx'
+import { TEXT_COLORS, HIGHLIGHTS, DEFAULT_INK } from '../../lib/palette.js'
+import { domToDoc, docToDom, isEmptyDoc } from '../../lib/richDoc.jsx'
 import styles from './RichTextEditor.module.css'
 
 /**
@@ -21,7 +21,9 @@ const BLOCK_TAG = { p: 'P', h1: 'H3', h2: 'H4' }
 
 export default function RichTextEditor({ value, onChange, id, placeholder }) {
   const ref = useRef(null)
+  const paletteRef = useRef(null)
   const [active, setActive] = useState({})
+  const [paletteOpen, setPaletteOpen] = useState(false)
   // Set while we're writing the caller's value in, so the resulting DOM
   // mutations don't echo straight back out as a change.
   const loading = useRef(false)
@@ -72,6 +74,18 @@ export default function RichTextEditor({ value, onChange, id, placeholder }) {
     return () => document.removeEventListener('selectionchange', refreshActive)
   }, [refreshActive])
 
+  useEffect(() => {
+    if (!paletteOpen) return
+    const onDown = (e) => { if (!paletteRef.current?.contains(e.target)) setPaletteOpen(false) }
+    const onKey = (e) => { if (e.key === 'Escape') setPaletteOpen(false) }
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [paletteOpen])
+
   /* --- commands ----------------------------------------------------------- */
   const run = (cmd, arg) => {
     const el = ref.current
@@ -80,6 +94,22 @@ export default function RichTextEditor({ value, onChange, id, placeholder }) {
     // Inline styles rather than <font> tags — easier to read back reliably.
     try { document.execCommand('styleWithCSS', false, true) } catch { /* older engines */ }
     document.execCommand(cmd, false, arg)
+    emit()
+    refreshActive()
+  }
+
+  /**
+   * Highlight. execCommand exposes this as hiliteColor in most engines and
+   * backColor in others, so try both rather than silently doing nothing.
+   */
+  const setHighlight = (hex) => {
+    const el = ref.current
+    if (!el) return
+    el.focus()
+    try { document.execCommand('styleWithCSS', false, true) } catch { /* older engines */ }
+    if (!document.execCommand('hiliteColor', false, hex)) {
+      document.execCommand('backColor', false, hex)
+    }
     emit()
     refreshActive()
   }
@@ -140,26 +170,75 @@ export default function RichTextEditor({ value, onChange, id, placeholder }) {
         />
         <Btn title="Remove link" label="Unlink" cmd={() => run('unlink')} />
 
-        <span className={styles.swatches} role="group" aria-label="Text colour">
-          {Object.entries(TEXT_COLORS).map(([name, meta]) => (
-            <button
-              key={name}
-              type="button"
-              title={`${meta.label} — ${meta.hint}`}
-              aria-label={`Colour text ${meta.label}`}
-              className={`${styles.swatch} ${styles[`sw_${name}`]}`}
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => run('foreColor', COLOR_TO_HEX[name])}
-            />
-          ))}
+        <span className={styles.paletteWrap} ref={paletteRef}>
           <button
             type="button"
-            title="Back to normal text colour"
-            aria-label="Remove colour"
-            className={`${styles.swatch} ${styles.swatchNone}`}
+            className={[styles.tool, paletteOpen ? styles.toolOn : ''].filter(Boolean).join(' ')}
+            aria-expanded={paletteOpen}
+            aria-haspopup="true"
+            title="Text colour and highlight"
             onMouseDown={(e) => e.preventDefault()}
-            onClick={() => run('foreColor', '#16202b')}
-          />
+            onClick={() => setPaletteOpen((v) => !v)}
+          >
+            <span className={styles.paletteSwatchIcon} aria-hidden="true" />
+            Colour ▾
+          </button>
+
+          {paletteOpen && (
+            <div className={styles.palettePanel} role="dialog" aria-label="Choose a colour">
+              <span className={styles.paletteLabel}>Text colour</span>
+              <div className={styles.paletteGrid}>
+                {Object.entries(TEXT_COLORS).map(([name, meta]) => (
+                  <button
+                    key={name}
+                    type="button"
+                    title={`${meta.label} — ${meta.hint}`}
+                    aria-label={`Text colour ${meta.label}`}
+                    className={styles.swatch}
+                    style={{ background: meta.hex }}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => { run('foreColor', meta.hex); setPaletteOpen(false) }}
+                  />
+                ))}
+                <button
+                  type="button"
+                  title="Back to normal text colour"
+                  aria-label="Remove text colour"
+                  className={`${styles.swatch} ${styles.swatchNone}`}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => { run('foreColor', DEFAULT_INK); setPaletteOpen(false) }}
+                />
+              </div>
+
+              <span className={styles.paletteLabel}>Highlight</span>
+              <div className={styles.paletteGrid}>
+                {Object.entries(HIGHLIGHTS).map(([name, meta]) => (
+                  <button
+                    key={name}
+                    type="button"
+                    title={`${meta.label} highlight — ${meta.hint}`}
+                    aria-label={`Highlight ${meta.label}`}
+                    className={`${styles.swatch} ${styles.swatchHl}`}
+                    style={{ background: meta.hex }}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => { setHighlight(meta.hex); setPaletteOpen(false) }}
+                  />
+                ))}
+                <button
+                  type="button"
+                  title="Remove highlight"
+                  aria-label="Remove highlight"
+                  className={`${styles.swatch} ${styles.swatchNone}`}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => { setHighlight('transparent'); setPaletteOpen(false) }}
+                />
+              </div>
+
+              <p className={styles.paletteNote}>
+                Every colour here stays readable on white and on any highlight.
+              </p>
+            </div>
+          )}
         </span>
 
         <span className={styles.spacer} />

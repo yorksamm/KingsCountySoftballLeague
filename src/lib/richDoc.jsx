@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
-import { parseBlocks, parseInlineRuns, TEXT_COLORS } from './richText.jsx'
+import { parseBlocks, parseInlineRuns } from './richText.jsx'
 import styles from './richText.module.css'
+import { TEXT_COLORS, HIGHLIGHTS, textColorName, highlightName } from './palette.js'
 
 /**
  * Structured document model for announcements.
@@ -20,7 +21,7 @@ import styles from './richText.module.css'
  *   Block = { type: 'p'|'h1'|'h2'|'hr', runs: [Run] }
  *         | { type: 'ul'|'ol', items: [[Run]] }
  *
- *   Run   = { text, b?, i?, u?, c?, href? }
+ *   Run   = { text, b?, i?, u?, c?, h?, href? }   c = text colour, h = highlight
  *
  * Marks are flat per run rather than a nested tree. Bold-inside-colour and
  * colour-inside-bold collapse to the same run, which is exactly right — the
@@ -49,13 +50,14 @@ function cleanRun(run) {
   if (run.i) out.i = true
   if (run.u) out.u = true
   if (run.c && Object.hasOwn(TEXT_COLORS, run.c)) out.c = run.c
+  if (run.h && Object.hasOwn(HIGHLIGHTS, run.h)) out.h = run.h
   const href = run.href ? safeHref(run.href) : null
   if (href) out.href = href
   return out
 }
 
 const sameMarks = (a, b) =>
-  a.b === b.b && a.i === b.i && a.u === b.u && a.c === b.c && a.href === b.href
+  a.b === b.b && a.i === b.i && a.u === b.u && a.c === b.c && a.h === b.h && a.href === b.href
 
 /** Merge adjacent runs that share formatting, so the doc stays compact. */
 function mergeRuns(runs) {
@@ -115,6 +117,7 @@ function renderRuns(runs, keyPrefix) {
     if (run.i) node = <em key={key}>{node}</em>
     if (run.u) node = <u key={key} className={styles.underline}>{node}</u>
     if (run.c) node = <span key={key} className={styles[`c_${run.c}`]}>{node}</span>
+    if (run.h) node = <mark key={key} className={styles[`h_${run.h}`]}>{node}</mark>
     if (run.href) {
       const external = !run.href.startsWith('/')
       node = (
@@ -222,24 +225,14 @@ export function markdownToDoc(text) {
 /* contenteditable bridge                                                     */
 /* -------------------------------------------------------------------------- */
 
-const COLOR_HEX = {
-  red: '#b03030', green: '#1f5c39', blue: '#27506f', orange: '#8f3f1e', gray: '#4a5866',
-}
+const COLOR_HEX = Object.fromEntries(
+  Object.entries(TEXT_COLORS).map(([name, meta]) => [name, meta.hex])
+)
+const HIGHLIGHT_HEX = Object.fromEntries(
+  Object.entries(HIGHLIGHTS).map(([name, meta]) => [name, meta.hex])
+)
 export const COLOR_TO_HEX = COLOR_HEX
-
-/** rgb(176, 48, 48) / #B03030 -> 'red'. Anything unrecognised is dropped. */
-function hexToColorName(value) {
-  if (!value) return null
-  let hex = String(value).trim().toLowerCase()
-  const rgb = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(hex)
-  if (rgb) {
-    hex = '#' + [1, 2, 3].map((i) => Number(rgb[i]).toString(16).padStart(2, '0')).join('')
-  }
-  for (const [name, h] of Object.entries(COLOR_HEX)) {
-    if (h.toLowerCase() === hex) return name
-  }
-  return null
-}
+export const HIGHLIGHT_TO_HEX = HIGHLIGHT_HEX
 
 /**
  * Walk a contenteditable subtree and reduce it to a document.
@@ -272,8 +265,11 @@ export function domToDoc(root) {
         const href = safeHref(n.getAttribute('href'))
         if (href) next.href = href
       }
-      const named = hexToColorName(n.style?.color || n.getAttribute?.('color'))
+      const named = textColorName(n.style?.color || n.getAttribute?.('color'))
       if (named) next.c = named
+      const hl = highlightName(n.style?.backgroundColor || n.getAttribute?.('bgcolor'))
+      if (hl) next.h = hl
+      if (tag === 'mark' && !next.h) next.h = 'yellow'
       // Browsers express bold/italic as inline styles too, depending on the
       // command and the paste source.
       const weight = n.style?.fontWeight
@@ -365,6 +361,12 @@ export function docToDom(doc, document_) {
       if (run.c) {
         const e = d.createElement('span')
         e.style.color = COLOR_HEX[run.c]
+        e.appendChild(node)
+        node = e
+      }
+      if (run.h) {
+        const e = d.createElement('span')
+        e.style.backgroundColor = HIGHLIGHT_HEX[run.h]
         e.appendChild(node)
         node = e
       }
