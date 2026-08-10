@@ -36,16 +36,71 @@ function safeHref(raw) {
   return null   // javascript:, data:, vbscript:, anything else
 }
 
-// Split on the inline markers while keeping the delimiters.
-const INLINE = /(\*\*[^*\n]+\*\*|\*[^*\n]+\*|\[[^\]\n]+\]\([^)\s]+\))/g
+/**
+ * Text colours available to announcement authors.
+ *
+ * A FIXED PALETTE, not a colour picker, on purpose. League notices are the one
+ * place on the site where text absolutely has to stay readable, and a free
+ * picker invites pale yellow on white. Every colour here is checked against the
+ * white card background at WCAG AA or better (lowest is red at 6.3:1).
+ *
+ * Keys are what the author types: {red:like this}
+ */
+export const TEXT_COLORS = {
+  red:    { label: 'Red',    hint: 'Cancellations, deadlines' },
+  green:  { label: 'Green',  hint: 'Confirmations, good news' },
+  blue:   { label: 'Blue',   hint: 'General information' },
+  orange: { label: 'Orange', hint: 'League accent colour' },
+  gray:   { label: 'Gray',   hint: 'De-emphasised, less important' },
+}
 
-function renderInline(text, keyPrefix) {
+const COLOR_NAMES = Object.keys(TEXT_COLORS).join('|')
+
+// Split on the inline markers while keeping the delimiters. Order matters:
+// ** before *, so bold isn't eaten by italic.
+const INLINE = new RegExp(
+  '(' +
+  `\\{(?:${COLOR_NAMES}):[^{}\\n]+\\}` + '|' +   // {red:coloured}
+  '\\+\\+[^\\n]+?\\+\\+' + '|' +                  // ++underlined++
+  '\\*\\*[^*\\n]+\\*\\*' + '|' +                  // **bold**
+  '\\*[^*\\n]+\\*' + '|' +                        // *italic*
+  '\\[[^\\]\\n]+\\]\\([^)\\s]+\\)' +              // [text](url)
+  ')',
+  'g'
+)
+
+const RE_COLOR = new RegExp(`^\\{(${COLOR_NAMES}):([^{}\\n]+)\\}$`)
+const RE_UNDERLINE = /^\+\+([^\n]+?)\+\+$/
+
+/**
+ * @param {number} depth guards against a pathological nest; content shrinks on
+ *                       every recursion so this is belt-and-braces only.
+ */
+function renderInline(text, keyPrefix, depth = 0) {
   return String(text)
     .split(INLINE)
     .filter((part) => part !== '' && part != null)
     .map((part, i) => {
       const key = `${keyPrefix}i${i}`
       let m
+
+      // Colour and underline recurse, so {red:**bold and red**} works. Bold and
+      // italic deliberately do not nest — their delimiters overlap and the
+      // ambiguity isn't worth it for a league notice.
+      if (depth < 4 && (m = RE_COLOR.exec(part))) {
+        return (
+          <span key={key} className={styles[`c_${m[1]}`]}>
+            {renderInline(m[2], `${key}c`, depth + 1)}
+          </span>
+        )
+      }
+      if (depth < 4 && (m = RE_UNDERLINE.exec(part))) {
+        return (
+          <u key={key} className={styles.underline}>
+            {renderInline(m[1], `${key}u`, depth + 1)}
+          </u>
+        )
+      }
 
       if ((m = /^\*\*([^*\n]+)\*\*$/.exec(part))) return <strong key={key}>{m[1]}</strong>
       if ((m = /^\*([^*\n]+)\*$/.exec(part))) return <em key={key}>{m[1]}</em>
@@ -205,6 +260,10 @@ export function toPlainText(text, maxLength = 160) {
     .replace(/^\s*\d+[.)]\s+/gm, '')
     .replace(/^\s*(-{3,}|\*{3,}|_{3,})\s*$/gm, '')
     .replace(/\[([^\]\n]+)\]\([^)\s]+\)/g, '$1')
+    // Colour and underline unwrap to their contents — the banner and the admin
+    // list are plain text, so the markers must not leak into them.
+    .replace(new RegExp(`\\{(?:${COLOR_NAMES}):([^{}\\n]+)\\}`, 'g'), '$1')
+    .replace(/\+\+([^\n]+?)\+\+/g, '$1')
     .replace(/\*\*([^*\n]+)\*\*/g, '$1')
     .replace(/\*([^*\n]+)\*/g, '$1')
     .replace(/\s+/g, ' ')
