@@ -83,6 +83,18 @@ npm run build
 npx vercel --prod
 ```
 
+### 7. The league logo
+
+`public/kcsl-logo-1280.jpg` and `kcsl-logo-800.jpg` are the home page banner,
+served responsively via `srcset`. They came from a 1.6 MB PNG, resized and
+converted to JPEG at 216 KB and 106 KB — a landing page should not ship 1.6 MB
+of logo. Replacing it means regenerating both sizes and keeping the `width`
+and `height` attributes in `src/pages/Home.jsx` matched to the new aspect
+ratio, or the page will jump as it loads.
+
+The same image is the Open Graph preview, so it's what appears when the site is
+shared in Messages, WhatsApp or Facebook.
+
 ### 7. Search engines
 
 > **Never put a `"comment"` key in `vercel.json`.** JSON has no comment syntax
@@ -221,54 +233,46 @@ Two switches control where an announcement appears:
 | **Published** | Shows on the home page, newest first. Unpublished ones aren't readable by the public at all — that's the RLS policy, not just a hidden UI element. |
 | **Important** | Also pins it to the top of the home page *and* puts it in the orange banner on every page. Only the newest Important one is bannered. |
 
-#### Formatting, without a markdown library
+#### The editor is WYSIWYG
 
-Announcement bodies support headings, bullet and numbered lists, bold, italic,
-**underline** (`++text++`), **text colour** (`{red:text}`), links and dividers. The admin editor has toolbar buttons for all of it plus a
-live preview, so nobody has to learn the syntax — but the syntax is there for
-anyone who wants it (`## Heading`, `- bullet`, `**bold**`, `[text](url)`, `---`).
+Announcements are written in a formatting box, not in a markup syntax. Buttons
+**toggle** — pressing Bold on bold text unbolds it, and the button shows as
+pressed when the caret is inside that formatting. What you see in the box is
+what the home page renders.
 
-Colour is a **fixed five-colour palette** — red, green, blue, orange, gray —
-not a colour picker. A free picker invites pale yellow on white, and a league
-notice is the one place text has to stay readable. Every colour is verified at
-WCAG AA or better against the white card (lowest is red at 6.3:1). Add one only
-after checking its contrast. Colour and underline nest with each other and with
-bold, so `{red:++urgent++}` works.
+Available: headings, bold, italic, underline, five text colours, bullet and
+numbered lists, links, undo/redo.
 
-**This is deliberately not a markdown library.** Every markdown package
-ultimately hands you an HTML string, which means `dangerouslySetInnerHTML`, and
-docs §8.3 rules that out — the admin session token lives in `localStorage`, and
-announcement bodies are the one place a human types content that everyone else
-reads. `src/lib/richText.jsx` parses the text and builds **React elements**, so
-there is no HTML string at any point and React escapes everything on its own.
+**Storage is a JSON document, not HTML.** The obvious thing would be to save
+the editor's `innerHTML`, but that forces `dangerouslySetInnerHTML` on the
+public page, which docs §8.3 rules out. Instead `src/lib/richDoc.jsx` walks the
+editor's DOM and reduces it to a restricted shape — a list of blocks, each
+holding text runs with a fixed set of marks — and the public page renders that
+back to React elements. No HTML string exists at any point, so there is nothing
+to sanitise and no way to smuggle a tag through. An `<img>`, `<script>` or
+`onclick` simply has no representation in the model and is dropped on save.
+Pastes are inserted as plain text for the same reason.
 
-Verified against a hostile body: `<script>` and `<img onerror=…>` render as
-literal visible text with zero tags created and no globals set; `javascript:`
-and `data:` links are stripped to plain text; only `http(s):`, `mailto:` and
-internal paths become real links. If you extend the parser, keep that property.
+**Colour: 11 text colours and 6 highlights**, all defined in one place
+(`src/lib/palette.js`) and still a fixed palette rather than a picker.
 
-### Rosters
+Highlights are what actually make a notice pop — far more than coloured text —
+which is exactly why they're pale: every text colour has to stay legible on top
+of one. The whole grid is safe because contrast of coloured text on a tint is
+just its contrast against white divided by the tint's, so
 
-Players have a name and an optional jersey number, and belong to one team.
-On the public **Teams** page each card opens its roster in a popup, and a
-**View all players** toggle switches to one searchable list of everyone in the
-league (search matches player *and* team name). Admins manage them under
-**Rosters**, one at a time or by CSV.
+    min(text contrast) / max(highlight contrast)  =  6.47 / 1.186  =  5.46:1
 
-Jersey numbers are stored as **text**, not integers — `"00"` is a real softball
-number and distinct from `"0"`, which an integer column would silently collapse.
-They're sorted numerically anyway, and players without a number sort last.
+Every one of the 11 x 7 combinations clears WCAG AA, and every text colour
+clears AA on plain white too. **Re-check that ratio before changing any value** —
+the earlier five-colour palette failed the moment highlights were added, at
+orange on pink, 3.85:1.
 
-Two database constraints exist specifically to make a re-imported roster fail
-loudly instead of silently duplicating a squad: one name per team
-(case- and whitespace-insensitive) and one jersey number per team. The same name
-on two different teams is fine.
-
-New database? `supabase_schema.sql` includes this. Existing one? Run
-[`supabase_migration_02_rosters.sql`](supabase_migration_02_rosters.sql).
-
-**Rosters are not seeded.** Inventing player names for your real teams risked
-publishing fake people, so the table starts empty.
+**Nothing published before this is lost.** Announcements written in the old
+marker syntax keep rendering from their original `body` text. The first time
+one is opened for editing it is converted (`markdownToDoc`) and saved as a
+document. Existing database? Run
+[`supabase_migration_03_announcement_body_doc.sql`](supabase_migration_03_announcement_body_doc.sql).
 
 ### Ordering
 

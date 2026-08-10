@@ -7,13 +7,15 @@ import Button from '../../components/ui/Button.jsx'
 import Spinner, { ErrorState } from '../../components/ui/Spinner.jsx'
 import { Badge } from '../../components/ui/Badge.jsx'
 import { toPlainText } from '../../lib/richText.jsx'
+import { markdownToDoc, docToPlainText, isEmptyDoc, normalizeDoc } from '../../lib/richDoc.jsx'
 import { useQuery } from '../../hooks/useQuery.js'
 import {
   getAllAnnouncements, createAnnouncement, updateAnnouncement, deleteAnnouncement,
 } from '../../lib/adminApi.js'
 import formStyles from '../../styles/form.module.css'
 
-const BLANK = { title: '', body: '', active: true, pinned: false }
+const EMPTY_DOC = { v: 1, blocks: [] }
+const BLANK = { title: '', body_doc: EMPTY_DOC, active: true, pinned: false }
 
 export default function AdminAnnouncements() {
   const { data, loading, error, refetch } = useQuery(getAllAnnouncements, [])
@@ -26,7 +28,19 @@ export default function AdminAnnouncements() {
 
   const open = (row) => {
     setEditing(row ?? BLANK)
-    setForm(row ? { title: row.title, body: row.body ?? '', active: row.active, pinned: row.pinned } : BLANK)
+    setForm(row
+      ? {
+          title: row.title,
+          // Announcements written before the editor became WYSIWYG only have
+          // the old marker text. Convert on open so they can be edited, and
+          // they'll be stored as a document the next time they're saved.
+          body_doc: row.body_doc
+            ? normalizeDoc(row.body_doc)
+            : markdownToDoc(row.body ?? ''),
+          active: row.active,
+          pinned: row.pinned,
+        }
+      : BLANK)
     setSaveError(null)
   }
 
@@ -34,7 +48,16 @@ export default function AdminAnnouncements() {
     setBusy(true)
     setSaveError(null)
     try {
-      const payload = { ...form, body: form.body || null }
+      const doc = normalizeDoc(form.body_doc)
+      const payload = {
+        title: form.title,
+        active: form.active,
+        pinned: form.pinned,
+        body_doc: isEmptyDoc(doc) ? null : doc,
+        // The legacy column is cleared on save so there is exactly one source
+        // of truth per announcement, never a stale copy rendering instead.
+        body: null,
+      }
       if (editing?.id) await updateAnnouncement(editing.id, payload)
       else await createAnnouncement(payload)
       setEditing(null)
@@ -79,9 +102,9 @@ export default function AdminAnnouncements() {
       render: (row) => (
         <div>
           <strong>{row.title}</strong>
-          {row.body && (
+          {(row.body_doc || row.body) && (
             <div style={{ fontSize: '.75rem', color: 'var(--ink-soft)', marginTop: '.15rem' }}>
-              {toPlainText(row.body, 120)}
+              {row.body_doc ? docToPlainText(row.body_doc, 120) : toPlainText(row.body, 120)}
             </div>
           )}
         </div>
@@ -174,22 +197,19 @@ export default function AdminAnnouncements() {
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               placeholder="Rainout — all Sunday games cancelled"
             />
-            <span className={formStyles.hint}>Displayed in bold in the banner.</span>
+            <span className={formStyles.hint}>Displayed in bold in the banner and as the post heading.</span>
           </div>
 
           <div className={formStyles.field}>
             <label htmlFor="a-body">Body</label>
             <RichTextEditor
               id="a-body"
-              value={form.body}
-              onChange={(body) => setForm({ ...form, body })}
+              value={form.body_doc}
+              onChange={(body_doc) => setForm({ ...form, body_doc })}
               placeholder={
-                'Write as much as you need.\n\n' +
-                '## Makeup games\n\n' +
-                'Rained-out games from June 14 will be played on:\n\n' +
-                '- Sunday, July 5 at Marine Pk # 5\n' +
-                '- Sunday, July 12 at Gerritsen #3\n\n' +
-                'Questions? Email your division rep.'
+                'Write the announcement here. Select some text and use the ' +
+                'buttons above to make it a heading, bold, colored, a list, ' +
+                'or a link — what you see here is what the home page shows.'
               }
             />
           </div>

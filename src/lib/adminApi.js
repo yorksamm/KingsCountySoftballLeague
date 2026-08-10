@@ -349,7 +349,7 @@ export async function getAllAnnouncements() {
   return unwrap(
     await supabase
       .from('announcements')
-      .select('id, title, body, active, pinned, created_at, updated_at')
+      .select('id, title, body, body_doc, active, pinned, created_at, updated_at')
       .order('pinned', { ascending: false })
       .order('created_at', { ascending: false })
   ) ?? []

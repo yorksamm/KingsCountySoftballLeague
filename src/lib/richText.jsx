@@ -1,5 +1,6 @@
 import { Fragment, useMemo } from 'react'
 import styles from './richText.module.css'
+import { TEXT_COLORS } from './palette.js'
 
 /**
  * A small, deliberately limited formatting language for announcements.
@@ -36,25 +37,20 @@ function safeHref(raw) {
   return null   // javascript:, data:, vbscript:, anything else
 }
 
-/**
- * Text colours available to announcement authors.
- *
- * A FIXED PALETTE, not a colour picker, on purpose. League notices are the one
- * place on the site where text absolutely has to stay readable, and a free
- * picker invites pale yellow on white. Every colour here is checked against the
- * white card background at WCAG AA or better (lowest is red at 6.3:1).
- *
- * Keys are what the author types: {red:like this}
- */
-export const TEXT_COLORS = {
-  red:    { label: 'Red',    hint: 'Cancellations, deadlines' },
-  green:  { label: 'Green',  hint: 'Confirmations, good news' },
-  blue:   { label: 'Blue',   hint: 'General information' },
-  orange: { label: 'Orange', hint: 'League accent colour' },
-  gray:   { label: 'Gray',   hint: 'De-emphasised, less important' },
-}
-
+// The legacy `{red:…}` syntax accepts whatever the shared palette defines, so
+// old announcements keep parsing as the palette grows. See lib/palette.js.
 const COLOR_NAMES = Object.keys(TEXT_COLORS).join('|')
+
+export { TEXT_COLORS }
+
+/*
+ * Bold has to be able to contain a lone `*` so `**bold with *italic* in**`
+ * matches at all — `[^*\n]+` made bold fail on that input and italic then
+ * grabbed the wrong spans. `\*(?!\*)` allows a single star but never `**`,
+ * which is what stops the greedy repeat running past the closing delimiter:
+ * in `**one** and **two**` the repeat cannot swallow the `**` after `one`.
+ */
+const BOLD_INNER = '(?:[^*\\n]|\\*(?!\\*))+'
 
 // Split on the inline markers while keeping the delimiters. Order matters:
 // ** before *, so bold isn't eaten by italic.
@@ -62,7 +58,7 @@ const INLINE = new RegExp(
   '(' +
   `\\{(?:${COLOR_NAMES}):[^{}\\n]+\\}` + '|' +   // {red:coloured}
   '\\+\\+[^\\n]+?\\+\\+' + '|' +                  // ++underlined++
-  '\\*\\*[^*\\n]+\\*\\*' + '|' +                  // **bold**
+  `\\*\\*${BOLD_INNER}\\*\\*` + '|' +             // **bold**
   '\\*[^*\\n]+\\*' + '|' +                        // *italic*
   '\\[[^\\]\\n]+\\]\\([^)\\s]+\\)' +              // [text](url)
   ')',
@@ -71,12 +67,28 @@ const INLINE = new RegExp(
 
 const RE_COLOR = new RegExp(`^\\{(${COLOR_NAMES}):([^{}\\n]+)\\}$`)
 const RE_UNDERLINE = /^\+\+([^\n]+?)\+\+$/
+const RE_BOLD = new RegExp(`^\\*\\*(${BOLD_INNER})\\*\\*$`)
+const RE_ITALIC = /^\*([^*\n]+)\*$/
 
 /**
- * @param {number} depth guards against a pathological nest; content shrinks on
- *                       every recursion so this is belt-and-braces only.
+ * Deep enough for every sane combination (colour > bold > underline > italic)
+ * with room to spare. Content strictly shrinks on each recursion — every
+ * wrapper strips at least two characters per side — so runaway recursion is
+ * impossible and this is only a backstop.
  */
+const MAX_DEPTH = 6
+
 function renderInline(text, keyPrefix, depth = 0) {
+  /**
+   * Render a wrapper's contents. EVERY format recurses through this — bold and
+   * italic used to return their inner text raw, which meant whichever format
+   * was on the outside won and anything inside bold or italic stayed literal
+   * (`**{red:x}**` printed the braces). At max depth we still strip the
+   * markers rather than leaking them into the page.
+   */
+  const kids = (inner, suffix) =>
+    depth < MAX_DEPTH ? renderInline(inner, `${keyPrefix}${suffix}`, depth + 1) : inner
+
   return String(text)
     .split(INLINE)
     .filter((part) => part !== '' && part != null)
@@ -84,26 +96,22 @@ function renderInline(text, keyPrefix, depth = 0) {
       const key = `${keyPrefix}i${i}`
       let m
 
-      // Colour and underline recurse, so {red:**bold and red**} works. Bold and
-      // italic deliberately do not nest — their delimiters overlap and the
-      // ambiguity isn't worth it for a league notice.
-      if (depth < 4 && (m = RE_COLOR.exec(part))) {
+      if ((m = RE_COLOR.exec(part))) {
         return (
           <span key={key} className={styles[`c_${m[1]}`]}>
-            {renderInline(m[2], `${key}c`, depth + 1)}
+            {kids(m[2], `${i}c`)}
           </span>
         )
       }
-      if (depth < 4 && (m = RE_UNDERLINE.exec(part))) {
-        return (
-          <u key={key} className={styles.underline}>
-            {renderInline(m[1], `${key}u`, depth + 1)}
-          </u>
-        )
+      if ((m = RE_UNDERLINE.exec(part))) {
+        return <u key={key} className={styles.underline}>{kids(m[1], `${i}u`)}</u>
       }
-
-      if ((m = /^\*\*([^*\n]+)\*\*$/.exec(part))) return <strong key={key}>{m[1]}</strong>
-      if ((m = /^\*([^*\n]+)\*$/.exec(part))) return <em key={key}>{m[1]}</em>
+      if ((m = RE_BOLD.exec(part))) {
+        return <strong key={key}>{kids(m[1], `${i}b`)}</strong>
+      }
+      if ((m = RE_ITALIC.exec(part))) {
+        return <em key={key}>{kids(m[1], `${i}e`)}</em>
+      }
 
       if ((m = /^\[([^\]\n]+)\]\(([^)\s]+)\)$/.exec(part))) {
         const href = safeHref(m[2])
@@ -122,6 +130,43 @@ function renderInline(text, keyPrefix, depth = 0) {
 
       return <Fragment key={key}>{part}</Fragment>
     })
+}
+
+/**
+ * Same grammar as renderInline, but produces flat styled runs instead of React
+ * elements — the bridge that lets an announcement written in the old marker
+ * syntax be opened in the WYSIWYG editor (see lib/richDoc.jsx).
+ *
+ * @returns {{text:string,b?:boolean,i?:boolean,u?:boolean,c?:string,href?:string}[]}
+ */
+export function parseInlineRuns(text, marks = {}, depth = 0) {
+  const out = []
+  const push = (inner, extra) => {
+    const nested = depth < MAX_DEPTH
+      ? parseInlineRuns(inner, { ...marks, ...extra }, depth + 1)
+      : [{ text: inner, ...marks, ...extra }]
+    out.push(...nested)
+  }
+
+  for (const part of String(text ?? '').split(INLINE)) {
+    if (part === '' || part == null) continue
+    let m
+
+    if ((m = RE_COLOR.exec(part))) { push(m[2], { c: m[1] }); continue }
+    if ((m = RE_UNDERLINE.exec(part))) { push(m[1], { u: true }); continue }
+    if ((m = RE_BOLD.exec(part))) { push(m[1], { b: true }); continue }
+    if ((m = RE_ITALIC.exec(part))) { push(m[1], { i: true }); continue }
+
+    if ((m = /^\[([^\]\n]+)\]\(([^)\s]+)\)$/.exec(part))) {
+      const href = safeHref(m[2])
+      out.push(href ? { text: m[1], ...marks, href } : { text: m[1], ...marks })
+      continue
+    }
+
+    out.push({ text: part, ...marks })
+  }
+
+  return out.filter((run) => run.text !== '')
 }
 
 const RE_HEADING = /^(#{1,3})\s+(.*)$/
