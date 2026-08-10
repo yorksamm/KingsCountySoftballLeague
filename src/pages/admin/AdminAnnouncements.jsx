@@ -208,7 +208,7 @@ export default function AdminAnnouncements() {
               onChange={(body_doc) => setForm({ ...form, body_doc })}
               placeholder={
                 'Write the announcement here. Select some text and use the ' +
-                'buttons above to make it a heading, bold, coloured, a list, ' +
+                'buttons above to make it a heading, bold, colored, a list, ' +
                 'or a link — what you see here is what the home page shows.'
               }
             />

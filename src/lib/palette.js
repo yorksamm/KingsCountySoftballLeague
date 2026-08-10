@@ -22,7 +22,7 @@
 export const TEXT_COLORS = {
   red:    { label: 'Red',    hex: '#b02121', hint: 'Cancellations, deadlines' },
   rose:   { label: 'Rose',   hex: '#a01050', hint: 'Urgent notices' },
-  orange: { label: 'Orange', hex: '#9c440c', hint: 'League accent colour' },
+  orange: { label: 'Orange', hex: '#9c440c', hint: 'League accent color' },
   brown:  { label: 'Brown',  hex: '#7b4b2a', hint: 'Field and venue notes' },
   green:  { label: 'Green',  hex: '#166534', hint: 'Confirmations, good news' },
   teal:   { label: 'Teal',   hex: '#00625a', hint: 'Schedule changes' },

@@ -176,24 +176,24 @@ export default function RichTextEditor({ value, onChange, id, placeholder }) {
             className={[styles.tool, paletteOpen ? styles.toolOn : ''].filter(Boolean).join(' ')}
             aria-expanded={paletteOpen}
             aria-haspopup="true"
-            title="Text colour and highlight"
+            title="Text color and highlight"
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => setPaletteOpen((v) => !v)}
           >
             <span className={styles.paletteSwatchIcon} aria-hidden="true" />
-            Colour ▾
+            Color ▾
           </button>
 
           {paletteOpen && (
-            <div className={styles.palettePanel} role="dialog" aria-label="Choose a colour">
-              <span className={styles.paletteLabel}>Text colour</span>
+            <div className={styles.palettePanel} role="dialog" aria-label="Choose a color">
+              <span className={styles.paletteLabel}>Text color</span>
               <div className={styles.paletteGrid}>
                 {Object.entries(TEXT_COLORS).map(([name, meta]) => (
                   <button
                     key={name}
                     type="button"
                     title={`${meta.label} — ${meta.hint}`}
-                    aria-label={`Text colour ${meta.label}`}
+                    aria-label={`Text color ${meta.label}`}
                     className={styles.swatch}
                     style={{ background: meta.hex }}
                     onMouseDown={(e) => e.preventDefault()}
@@ -202,8 +202,8 @@ export default function RichTextEditor({ value, onChange, id, placeholder }) {
                 ))}
                 <button
                   type="button"
-                  title="Back to normal text colour"
-                  aria-label="Remove text colour"
+                  title="Back to normal text color"
+                  aria-label="Remove text color"
                   className={`${styles.swatch} ${styles.swatchNone}`}
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => { run('foreColor', DEFAULT_INK); setPaletteOpen(false) }}
@@ -235,7 +235,7 @@ export default function RichTextEditor({ value, onChange, id, placeholder }) {
               </div>
 
               <p className={styles.paletteNote}>
-                Every colour here stays readable on white and on any highlight.
+                Every color here stays readable on white and on any highlight.
               </p>
             </div>
           )}
