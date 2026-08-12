@@ -53,10 +53,6 @@ export default function Home() {
 
   return (
     <div className={`wrap ${styles.page}`}>
-      {/* The masthead carries a navy panel of its own rather than sitting on the
-          page canvas. On the flat background the top of the page read as an
-          image floating in empty space; as a block it gives the page somewhere
-          to start. */}
       <header className={styles.masthead}>
         {/* Logo beside the name rather than above it. Stacked, a square badge
             in a 720px reading column left a lot of dead space either side on a
@@ -74,10 +70,11 @@ export default function Home() {
           aria-hidden="true"
           fetchpriority="high"
         />
-        {/* Just the league name — no strapline and no subheading beneath
-            it. The badge carries the branding; anything more here was the
-            same words a second and third time. */}
-        <h1 className={styles.title}>{LEAGUE.name}</h1>
+        {/* The badge carries the league name in its own artwork, so the
+            heading is not drawn — but a page still needs an h1, both for the
+            document outline screen readers announce and for the name Google
+            shows in a result. Hidden visually, present in the markup. */}
+        <h1 className="visually-hidden">{LEAGUE.name}</h1>
       </header>
 
       {/* Landing page still has to answer "when do we play next?" in one look,

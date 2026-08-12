@@ -117,8 +117,8 @@ export default function PublicLayout() {
             <img
               className={styles.mark}
               src="/kcsl-mark.png"
-              width="96"
-              height="96"
+              width="128"
+              height="128"
               alt=""
               aria-hidden="true"
             />

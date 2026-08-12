@@ -9,32 +9,24 @@
    not get past ~210px without crushing the heading, and the badge's own
    wordmark was unreadable at that size. Going wider buys the room.
 
-   It is a filled navy panel rather than a rule on the page canvas: the same
-   gradient the admin sign-in page uses, so the two read as one site. Contained
-   at --column rather than full-bleed, because edge-to-edge navy directly under
-   the navy site header merged into a single slab with no visible seam. */
+   It sits on the page canvas with a rule under it rather than in a filled navy
+   panel. The panel was too loud for what is otherwise a light page — a block of
+   brand colour arriving before any content, reading as an ad rather than as the
+   top of the page. The rule gives the same "this is the masthead" break without
+   putting a second navy slab under the navy site header. */
 .masthead {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 2.25rem;
   max-width: var(--column);
-  margin: 0 auto 2.25rem;
-  padding: 2.25rem 2rem;
-  border-radius: var(--radius);
-  background:
-    radial-gradient(900px 400px at 50% -25%, var(--navy-700), transparent 70%),
-    var(--navy-900);
-  box-shadow: var(--shadow);
-  color: #fff;
+  margin: 0 auto 1.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 3px solid var(--navy-900);
 }
 
 /* width/height are on the element so the browser reserves the space and the
-   page doesn't jump when the file loads.
-
-   No disc behind it: the badge sits straight on the panel. Its navy outer ring
-   goes quiet against the navy, which is the point — the white face reads as the
-   edge instead, and it sits in the panel rather than on top of it. */
+   page doesn't jump when the file loads. */
 .logo {
   flex: none;
   width: 330px;
@@ -42,14 +34,8 @@
   object-fit: contain;
 }
 
-.title {
-  margin: 0;
-  font-size: 2.5rem;
-  line-height: 1.15;
-  letter-spacing: -.02em;
-  text-wrap: balance;
-  color: #fff;
-}
+/* No .title rule: the masthead heading is visually hidden, so it takes the
+   shared .visually-hidden utility and needs no typography of its own. */
 
 /* Section labels ---------------------------------------------------------- */
 
@@ -211,17 +197,9 @@
   color: var(--clay);
 }
 
-/* Below the point where badge + heading stop fitting side by side, stack and
-   centre rather than shrinking the badge back down to unreadable. */
+/* Step the badge down rather than letting it push the column wider. */
 @media (max-width: 800px) {
-  .masthead {
-    flex-direction: column;
-    text-align: center;
-    gap: 1.25rem;
-    padding: 2rem 1.25rem;
-  }
   .logo { width: 300px; height: 300px; }
-  .title { font-size: 2rem; }
 }
 
 /* "Upcoming games" plus the arrow and padding needs 209px of tile, so four
@@ -239,9 +217,7 @@
 }
 
 @media (max-width: 560px) {
-  .masthead { padding: 1.5rem 1rem; }
   .logo { width: 260px; height: 260px; }
-  .title { font-size: 1.5rem; }
   .post { padding: 1.25rem; }
   .postTitle { font-size: 1.25rem; }
   .nextGo { margin-left: 0; }
