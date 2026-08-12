@@ -45,7 +45,7 @@ export default function AdminLayout() {
           </button>
 
           <Link to="/admin" className={styles.brand}>
-            <span className={styles.mark}>{LEAGUE.short}</span>
+            <img className={styles.mark} src="/kcsl-mark.png" width="96" height="96" alt="" aria-hidden="true" />
             <span>Admin</span>
           </Link>
 

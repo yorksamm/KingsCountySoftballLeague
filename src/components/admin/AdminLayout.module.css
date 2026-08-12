@@ -21,14 +21,10 @@
 .brand:hover { text-decoration: none; }
 
 .mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px; height: 30px;
-  border-radius: 50%;
-  background: var(--clay);
-  font-size: .625rem;
-  font-weight: 800;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
 }
 
 .topbarRight {

@@ -114,7 +114,14 @@ export default function PublicLayout() {
       <header className={styles.header}>
         <div className={`wrap ${styles.headerInner}`}>
           <NavLink to="/" className={styles.brand} onClick={() => setMenuOpen(false)}>
-            <span className={styles.mark} aria-hidden="true">{LEAGUE.short}</span>
+            <img
+              className={styles.mark}
+              src="/kcsl-mark.png"
+              width="96"
+              height="96"
+              alt=""
+              aria-hidden="true"
+            />
             <span className={styles.brandName}>{LEAGUE.name}</span>
           </NavLink>
 

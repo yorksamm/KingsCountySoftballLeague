@@ -74,15 +74,12 @@
 .brand:hover { text-decoration: none; }
 
 .mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px; height: 38px;
-  border-radius: 50%;
-  background: var(--clay);
-  font-size: .75rem;
-  font-weight: 800;
-  letter-spacing: .02em;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  /* The badge carries its own circular border and transparent surround, so it
+     needs no background of its own — it sits straight on the navy bar. */
+  object-fit: contain;
 }
 
 .brandName {

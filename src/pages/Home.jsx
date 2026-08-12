@@ -41,28 +41,26 @@ export default function Home() {
   return (
     <div className={`wrap ${styles.page}`}>
       <header className={styles.masthead}>
-        {/* The logo already says the league's name, so repeating it as visible
-            text would just be the same words twice. The h1 stays for search
-            engines and screen readers, hidden visually. */}
-        <h1 className="visually-hidden">{LEAGUE.name}</h1>
-        {/* Not lazy-loaded: this is the largest paint on the page and sits
-            above the fold, so deferring it would only delay it. width/height
-            are set so the browser reserves the space and the page doesn't
-            jump when the file arrives.
-            `fetchpriority` is lowercase on purpose — React 18 only forwards
-            the camelCase spelling from v19 onward, and warns instead of
-            passing it through. */}
+        {/* Logo beside the name rather than above it. Stacked, a square badge
+            in a 720px reading column left a lot of dead space either side on a
+            laptop; as a row it fills the measure and reads as a masthead. It
+            stacks back to centred on narrow screens.
+            Not lazy-loaded: largest paint on the page, above the fold.
+            `fetchpriority` is lowercase because React 18 only forwards the
+            camelCase spelling from v19 onward. */}
         <img
           className={styles.logo}
-          src="/kcsl-logo-1280.jpg"
-          srcSet="/kcsl-logo-800.jpg 800w, /kcsl-logo-1280.jpg 1280w"
-          sizes="(max-width: 760px) 100vw, 720px"
-          width="1280"
-          height="853"
-          alt="Kings County Softball League — American Softball Association. Play. Compete. Respect."
+          src="/kcsl-logo.png"
+          width="512"
+          height="512"
+          alt=""
+          aria-hidden="true"
           fetchpriority="high"
         />
-        <p className={styles.tagline}>League news, notices, and information</p>
+        <div className={styles.mastheadText}>
+          <h1 className={styles.title}>{LEAGUE.name}</h1>
+          <p className={styles.tagline}>League news, notices, and information</p>
+        </div>
       </header>
 
       {/* Landing page still has to answer "when do we play next?" in one look,

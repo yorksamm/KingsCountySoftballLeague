@@ -85,15 +85,26 @@ npx vercel --prod
 
 ### 7. The league logo
 
-`public/kcsl-logo-1280.jpg` and `kcsl-logo-800.jpg` are the home page banner,
-served responsively via `srcset`. They came from a 1.6 MB PNG, resized and
-converted to JPEG at 216 KB and 106 KB — a landing page should not ship 1.6 MB
-of logo. Replacing it means regenerating both sizes and keeping the `width`
-and `height` attributes in `src/pages/Home.jsx` matched to the new aspect
-ratio, or the page will jump as it loads.
+`public/` holds four sizes generated from the circular league badge:
 
-The same image is the Open Graph preview, so it's what appears when the site is
-shared in Messages, WhatsApp or Facebook.
+| File | Used for |
+|---|---|
+| `kcsl-logo.png` (512) | home page masthead, Open Graph preview |
+| `kcsl-mark.png` (96) | site header and admin header, shown at 40px |
+| `apple-touch-icon.png` (180) | iOS home-screen icon |
+| `favicon.png` (32) | browser tab |
+
+They stay **PNG**, not JPEG: the badge has a transparent surround, which is what
+lets it sit directly on the dark navy header. JPEG would fill that with white.
+
+Replacing the logo means regenerating all four and keeping the `width`/`height`
+attributes in `src/pages/Home.jsx` matched to the new aspect ratio, or the page
+will jump as it loads.
+
+One known limitation: at 32px the badge's wordmark is unreadable — that's
+inherent to a detailed logo at favicon size. The circular navy/red shape is
+still recognisable in a tab. A simplified mark drawn specifically for small
+sizes would be the fix if it ever matters.
 
 ### 7. Search engines
 
