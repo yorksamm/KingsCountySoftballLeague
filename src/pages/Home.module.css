@@ -4,13 +4,18 @@
 
 .page { }
 
+/* The masthead is a banner, not prose, so it is NOT held to the 720px reading
+   measure the announcements use. Inside that column a side-by-side badge could
+   not get past ~210px without crushing the heading, and the badge's own
+   wordmark was unreadable at that size. Going wider buys the room. */
 .masthead {
   display: flex;
   align-items: center;
-  gap: 1.75rem;
-  max-width: 720px;
-  margin: 0 auto 1.5rem;
-  padding-bottom: 1.25rem;
+  justify-content: center;
+  gap: 2rem;
+  max-width: var(--column);
+  margin: 0 auto 1.75rem;
+  padding-bottom: 1.5rem;
   border-bottom: 3px solid var(--navy-900);
 }
 
@@ -18,15 +23,15 @@
    page doesn't jump when the file loads. */
 .logo {
   flex: none;
-  width: 210px;
-  height: 210px;
+  width: 330px;
+  height: 330px;
   object-fit: contain;
 }
 
 .title {
   margin: 0;
-  font-size: 1.75rem;
-  line-height: 1.2;
+  font-size: 2.25rem;
+  line-height: 1.15;
   letter-spacing: -.02em;
   text-wrap: balance;
 }
@@ -37,7 +42,7 @@
   flex-wrap: wrap;
   align-items: baseline;
   gap: .35rem .85rem;
-  max-width: 720px;
+  max-width: var(--column);
   margin: 0 auto 2rem;
   padding: .95rem 1.15rem;
   border: 1px solid var(--line);
@@ -70,7 +75,7 @@
 
 /* Posts ------------------------------------------------------------------- */
 .feed {
-  max-width: 720px;
+  max-width: var(--column);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -128,7 +133,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: .75rem 1.75rem;
-  max-width: 720px;
+  max-width: var(--column);
   margin: 2.5rem auto 0;
   padding-top: 1.5rem;
   border-top: 1px solid var(--line);
@@ -136,9 +141,16 @@
 
 .footLink { font-size: 1rem; font-weight: 600; }
 
-@media (max-width: 560px) {
+/* Below the point where badge + heading stop fitting side by side, stack and
+   centre rather than shrinking the badge back down to unreadable. */
+@media (max-width: 800px) {
   .masthead { flex-direction: column; text-align: center; gap: 1rem; }
-  .logo { width: 230px; height: 230px; }
+  .logo { width: 300px; height: 300px; }
+  .title { font-size: 1.875rem; }
+}
+
+@media (max-width: 560px) {
+  .logo { width: 260px; height: 260px; }
   .title { font-size: 1.5rem; }
   .post { padding: 1.25rem; }
   .postTitle { font-size: 1.25rem; }
