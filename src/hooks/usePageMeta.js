@@ -40,6 +40,7 @@ function setCanonical(href) {
 /**
  * @param {object}  options
  * @param {string}  options.title        page name, without the league suffix
+ * @param {string}  options.fullTitle    exact <title>, bypassing the suffix
  * @param {string}  options.description  one sentence, ~150 characters
  * @param {boolean} options.noindex      true for admin screens
  */
@@ -47,11 +48,14 @@ const DEFAULT_DESCRIPTION =
   `Official site of the ${LEAGUE.name}. Game schedules, scores, standings, ` +
   'team rosters, field locations and league rules.'
 
-export function usePageMeta({ title, description, noindex = false } = {}) {
+export function usePageMeta({ title, fullTitle: exactTitle, description, noindex = false } = {}) {
   const { pathname } = useLocation()
 
   useEffect(() => {
-    const fullTitle = title ? `${title} — ${LEAGUE.name}` : LEAGUE.name
+    // The home page passes fullTitle so its rendered <title> matches the one
+    // in index.html byte for byte. A crawler that compares the raw HTML with
+    // the rendered DOM then sees one consistent title instead of two.
+    const fullTitle = exactTitle || (title ? `${title} — ${LEAGUE.name}` : LEAGUE.name)
     document.title = fullTitle
 
     // Query strings are filters, not distinct pages — canonicalise to the path
@@ -74,7 +78,7 @@ export function usePageMeta({ title, description, noindex = false } = {}) {
       noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large'
     )
     setCanonical(url)
-  }, [title, description, noindex, pathname])
+  }, [title, exactTitle, description, noindex, pathname])
 }
 
 export default usePageMeta

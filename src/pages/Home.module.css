@@ -25,13 +25,12 @@
   border-bottom: 3px solid var(--navy-900);
 }
 
-/* width/height are on the element so the browser reserves the space and the
-   page doesn't jump when the file loads. */
+/* Wide crest rather than a square badge, so this is sized on width alone and
+   lets its own 3:2 aspect set the height. width/height attributes on the
+   element reserve the space, so the page doesn't jump when the file loads. */
 .logo {
-  flex: none;
-  width: 330px;
-  height: 330px;
-  object-fit: contain;
+  width: min(660px, 100%);
+  height: auto;
 }
 
 /* No .title rule: the masthead heading is visually hidden, so it takes the
@@ -197,10 +196,8 @@
   color: var(--clay);
 }
 
-/* Step the badge down rather than letting it push the column wider. */
-@media (max-width: 800px) {
-  .logo { width: 300px; height: 300px; }
-}
+/* No .logo override needed at any width: min(660px, 100%) already shrinks it
+   to the column, and height: auto keeps the crest's aspect ratio. */
 
 /* "Upcoming games" plus the arrow and padding needs 209px of tile, so four
    across only works once the viewport clears about 920px. 940 leaves a little
@@ -217,7 +214,6 @@
 }
 
 @media (max-width: 560px) {
-  .logo { width: 260px; height: 260px; }
   .post { padding: 1.25rem; }
   .postTitle { font-size: 1.25rem; }
   .nextGo { margin-left: 0; }

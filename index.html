@@ -4,10 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <!-- Keep this title identical to the one Home.jsx sets at runtime. A
+         mismatch between the served HTML and the rendered DOM is a signal
+         Google is free to resolve by writing its own title instead. -->
     <title>Kings County Softball League — Schedules, Scores &amp; Standings</title>
     <meta
       name="description"
-      content="Official site of the Kings County Softball League in Brooklyn, NY. Game schedules, scores, standings, team rosters, field locations and league rules."
+      content="Find upcoming games, field locations, the full season schedule, division standings and team rosters for the Kings County Softball League in Brooklyn, NY."
     />
 
     <!-- Canonical is rewritten per route at runtime (src/hooks/usePageMeta.js).
@@ -26,7 +29,7 @@
     <meta property="og:title" content="Kings County Softball League" />
     <meta
       property="og:description"
-      content="Schedules, scores, standings, rosters and field locations for the Kings County Softball League in Brooklyn, NY."
+      content="Find upcoming games, field locations, the full season schedule, division standings and team rosters for the Kings County Softball League in Brooklyn, NY."
     />
     <meta property="og:url" content="https://kings-county-softball-league.vercel.app/" />
     <meta property="og:image" content="https://kings-county-softball-league.vercel.app/kcsl-logo.png" />
@@ -38,27 +41,46 @@
     <meta name="twitter:title" content="Kings County Softball League" />
     <meta
       name="twitter:description"
-      content="Schedules, scores, standings, rosters and field locations for the Kings County Softball League in Brooklyn, NY."
+      content="Find upcoming games, field locations, the full season schedule, division standings and team rosters for the Kings County Softball League in Brooklyn, NY."
     />
 
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
     <!-- Tells Google what kind of thing this site is, which helps it show the
-         league name and location rather than a bare URL. -->
+         league name and location rather than a bare URL.
+
+         The WebSite entry is what Google reads for the "site name" line above a
+         result — the line currently reading "Vercel", which it infers from the
+         vercel.app host. This is the documented way to ask for something else,
+         though a custom domain is the only reliable fix. -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "SportsOrganization",
-        "name": "Kings County Softball League",
-        "alternateName": "KCSL",
-        "sport": "Softball",
-        "url": "https://kings-county-softball-league.vercel.app/",
-        "logo": "https://kings-county-softball-league.vercel.app/kcsl-logo.png",
-        "areaServed": {
-          "@type": "Place",
-          "name": "Brooklyn, New York"
-        }
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://kings-county-softball-league.vercel.app/#website",
+            "name": "Kings County Softball League",
+            "alternateName": "KCSL",
+            "url": "https://kings-county-softball-league.vercel.app/",
+            "description": "Schedules, scores, standings, team rosters and field locations for the Kings County Softball League in Brooklyn, NY.",
+            "publisher": { "@id": "https://kings-county-softball-league.vercel.app/#league" }
+          },
+          {
+            "@type": "SportsOrganization",
+            "@id": "https://kings-county-softball-league.vercel.app/#league",
+            "name": "Kings County Softball League",
+            "alternateName": "KCSL",
+            "sport": "Softball",
+            "url": "https://kings-county-softball-league.vercel.app/",
+            "logo": "https://kings-county-softball-league.vercel.app/kcsl-logo.png",
+            "areaServed": {
+              "@type": "Place",
+              "name": "Brooklyn, New York"
+            }
+          }
+        ]
       }
     </script>
 

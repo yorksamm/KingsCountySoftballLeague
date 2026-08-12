@@ -31,10 +31,13 @@ const PAGE_TILES = [
  * needs people to see when they arrive.
  */
 export default function Home() {
+  // Describes what the site DOES, not what today's announcement happens to
+  // say. The old copy led on announcements, which is part of why the Google
+  // result was a wall of registration phone numbers.
   usePageMeta({
-    title: 'League news, notices and announcements',
+    fullTitle: `${LEAGUE.name} — Schedules, Scores & Standings`,
     description:
-      'Announcements, rainouts, playoff information and league notices for the Kings County Softball League in Brooklyn, NY.',
+      'Find upcoming games, field locations, the full season schedule, division standings and team rosters for the Kings County Softball League in Brooklyn, NY.',
   })
   const { data, loading, error, refetch } = useQueries({
     announcements: getActiveAnnouncements,
@@ -54,18 +57,18 @@ export default function Home() {
   return (
     <div className={`wrap ${styles.page}`}>
       <header className={styles.masthead}>
-        {/* Logo beside the name rather than above it. Stacked, a square badge
-            in a 720px reading column left a lot of dead space either side on a
-            laptop; as a row it fills the measure and reads as a masthead. It
-            stacks back to centred on narrow screens.
+        {/* The wide crest, not the circular badge the header and favicon use —
+            it fills the measure and carries more of the brand at a glance.
+            The white background it shipped with has been knocked out, so it
+            sits on the page canvas rather than in a white box.
             Not lazy-loaded: largest paint on the page, above the fold.
             `fetchpriority` is lowercase because React 18 only forwards the
             camelCase spelling from v19 onward. */}
         <img
           className={styles.logo}
-          src="/kcsl-logo.png"
-          width="512"
-          height="512"
+          src="/kcsl-wordmark.png"
+          width="1000"
+          height="667"
           alt=""
           aria-hidden="true"
           fetchpriority="high"
@@ -112,8 +115,14 @@ export default function Home() {
           {announcements.map((post) => {
             const posted = parseLocalDate(String(post.created_at).slice(0, 10))
             return (
+              // data-nosnippet for the same reason as the sitewide banner: the
+              // announcements are the bulk of the text on this page, so Google
+              // was building the search description out of them. Indexed and
+              // searchable as before — just not eligible to BE the snippet, so
+              // the meta description above wins instead.
               <article
                 key={post.id}
+                data-nosnippet
                 className={[styles.post, post.pinned ? styles.pinned : ''].filter(Boolean).join(' ')}
               >
                 <header className={styles.postHead}>

@@ -78,7 +78,13 @@ function AnnouncementBanner() {
   }
 
   return (
-    <div className={styles.banner} role="status">
+    // data-nosnippet: this strip repeats on EVERY page, so Google was pulling
+    // whatever the current notice says into the search result for the whole
+    // site — registration phone numbers instead of what the site is for. It
+    // still gets indexed and is still found by search; it just can't be the
+    // description. Remove this attribute if you would rather notices show up
+    // in the snippet.
+    <div className={styles.banner} role="status" data-nosnippet>
       <div className={`wrap ${styles.bannerInner}`}>
         <div className={styles.bannerText}>
           <span className={styles.pin} title="Pinned">★</span>
