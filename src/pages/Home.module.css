@@ -7,36 +7,28 @@
 .masthead {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.75rem;
   max-width: 720px;
   margin: 0 auto 1.5rem;
   padding-bottom: 1.25rem;
   border-bottom: 3px solid var(--navy-900);
 }
 
-/* Sized so the badge's own wordmark stays legible without dominating the row.
-   width/height are on the element so the browser reserves the space and the
+/* width/height are on the element so the browser reserves the space and the
    page doesn't jump when the file loads. */
 .logo {
   flex: none;
-  width: 150px;
-  height: 150px;
+  width: 210px;
+  height: 210px;
   object-fit: contain;
 }
 
-.mastheadText { min-width: 0; }
-
 .title {
   margin: 0;
-  font-size: 1.875rem;
-  line-height: 1.15;
+  font-size: 1.75rem;
+  line-height: 1.2;
   letter-spacing: -.02em;
-}
-
-.tagline {
-  margin: .3rem 0 0;
-  font-size: 1.0625rem;
-  color: var(--ink-soft);
+  text-wrap: balance;
 }
 
 /* "Next games" strip ------------------------------------------------------ */
@@ -145,8 +137,8 @@
 .footLink { font-size: 1rem; font-weight: 600; }
 
 @media (max-width: 560px) {
-  .masthead { flex-direction: column; text-align: center; gap: .75rem; }
-  .logo { width: 190px; height: 190px; }
+  .masthead { flex-direction: column; text-align: center; gap: 1rem; }
+  .logo { width: 230px; height: 230px; }
   .title { font-size: 1.5rem; }
   .post { padding: 1.25rem; }
   .postTitle { font-size: 1.25rem; }
