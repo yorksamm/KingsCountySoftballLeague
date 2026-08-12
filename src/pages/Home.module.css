@@ -32,16 +32,13 @@
 /* width/height are on the element so the browser reserves the space and the
    page doesn't jump when the file loads.
 
-   The white disc is doing real work: the badge's outermost ring is navy, so on
-   the navy panel its edge vanished and it read as a torn-out white blob. The
-   padding pushes a white halo past that ring and gives it back its outline. */
+   No disc behind it: the badge sits straight on the panel. Its navy outer ring
+   goes quiet against the navy, which is the point — the white face reads as the
+   edge instead, and it sits in the panel rather than on top of it. */
 .logo {
   flex: none;
   width: 330px;
   height: 330px;
-  padding: 9px;
-  border-radius: 50%;
-  background: #fff;
   object-fit: contain;
 }
 
@@ -172,11 +169,15 @@
 /* Page tiles -------------------------------------------------------------- */
 
 /* These replaced a row of four bare text links. Cards give each destination a
-   real target to hit and room for a line saying what is behind it, and they
-   stop the page trailing off into nothing at the bottom. */
+   real target to hit, and they stop the page trailing off into nothing at the
+   bottom.
+
+   Four across, not two: carrying only a label, a half-width tile was a long
+   short bar of mostly empty card, which is the sparseness these were meant to
+   fix. At --column four labels fit with room to spare. */
 .tiles {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
   max-width: var(--column);
   margin: 0 auto;
@@ -184,9 +185,10 @@
 
 .tile {
   display: flex;
-  flex-direction: column;
-  gap: .3rem;
-  padding: 1.15rem 1.25rem;
+  align-items: center;
+  gap: .75rem;
+  min-height: 60px;
+  padding: 1rem 1.15rem;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
@@ -200,8 +202,6 @@
   background: #fffaf7;
 }
 
-.tileHead { display: flex; align-items: baseline; gap: .75rem; }
-
 .tileTitle { font-size: 1.0625rem; font-weight: 700; }
 
 .tileGo {
@@ -210,8 +210,6 @@
   font-weight: 700;
   color: var(--clay);
 }
-
-.tileNote { font-size: .875rem; line-height: 1.45; color: var(--ink-soft); }
 
 /* Below the point where badge + heading stop fitting side by side, stack and
    centre rather than shrinking the badge back down to unreadable. */
@@ -226,9 +224,17 @@
   .title { font-size: 2rem; }
 }
 
-/* Side by side, two tiles get too narrow to hold their note on one or two
-   lines, and the ragged heights read worse than a single column. */
-@media (max-width: 640px) {
+/* "Upcoming games" plus the arrow and padding needs 209px of tile, so four
+   across only works once the viewport clears about 920px. 940 leaves a little
+   headroom. Deliberately not tied to the masthead's 800px stacking point —
+   the two want different thresholds. */
+@media (max-width: 940px) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Same 209px floor: two across wraps below roughly 470px of viewport. Dropping
+   to one column at 520 clears that and covers every phone width. */
+@media (max-width: 520px) {
   .tiles { grid-template-columns: minmax(0, 1fr); }
 }
 

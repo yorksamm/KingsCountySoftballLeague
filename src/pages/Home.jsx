@@ -13,14 +13,14 @@ import { usePageMeta } from '../hooks/usePageMeta.js'
 /**
  * Where the rest of the site lives, as tiles at the foot of the page.
  *
- * These were four bare text links in a row, which nobody clicked. The note is
- * there to answer "what's behind this?" before the click rather than after.
+ * These were four bare text links in a row, which nobody clicked. A tile is a
+ * far bigger target; the label alone carries it, so there is no description.
  */
 const PAGE_TILES = [
-  { to: '/upcoming',  title: 'Upcoming games', note: 'Who plays next, at what time and on which field.' },
-  { to: '/schedule',  title: 'Full schedule',  note: 'Every game this season with scores, filterable by division and team.' },
-  { to: '/standings', title: 'Standings',      note: 'Division tables — record, win percentage, games behind and run differential.' },
-  { to: '/rules',     title: 'League rules',   note: 'The official KCSL rulebook.' },
+  { to: '/upcoming',  title: 'Upcoming games' },
+  { to: '/schedule',  title: 'Full schedule' },
+  { to: '/standings', title: 'Standings' },
+  { to: '/rules',     title: 'League rules' },
 ]
 
 /**
@@ -151,11 +151,8 @@ export default function Home() {
       <nav className={styles.tiles} aria-label="League pages">
         {PAGE_TILES.map((tile) => (
           <Link key={tile.to} to={tile.to} className={styles.tile}>
-            <span className={styles.tileHead}>
-              <span className={styles.tileTitle}>{tile.title}</span>
-              <span className={styles.tileGo} aria-hidden="true">→</span>
-            </span>
-            <span className={styles.tileNote}>{tile.note}</span>
+            <span className={styles.tileTitle}>{tile.title}</span>
+            <span className={styles.tileGo} aria-hidden="true">→</span>
           </Link>
         ))}
       </nav>
