@@ -7,34 +7,81 @@
 /* The masthead is a banner, not prose, so it is NOT held to the 720px reading
    measure the announcements use. Inside that column a side-by-side badge could
    not get past ~210px without crushing the heading, and the badge's own
-   wordmark was unreadable at that size. Going wider buys the room. */
+   wordmark was unreadable at that size. Going wider buys the room.
+
+   It is a filled navy panel rather than a rule on the page canvas: the same
+   gradient the admin sign-in page uses, so the two read as one site. Contained
+   at --column rather than full-bleed, because edge-to-edge navy directly under
+   the navy site header merged into a single slab with no visible seam. */
 .masthead {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
+  gap: 2.25rem;
   max-width: var(--column);
-  margin: 0 auto 1.75rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 3px solid var(--navy-900);
+  margin: 0 auto 2.25rem;
+  padding: 2.25rem 2rem;
+  border-radius: var(--radius);
+  background:
+    radial-gradient(900px 400px at 50% -25%, var(--navy-700), transparent 70%),
+    var(--navy-900);
+  box-shadow: var(--shadow);
+  color: #fff;
 }
 
 /* width/height are on the element so the browser reserves the space and the
-   page doesn't jump when the file loads. */
+   page doesn't jump when the file loads.
+
+   The white disc is doing real work: the badge's outermost ring is navy, so on
+   the navy panel its edge vanished and it read as a torn-out white blob. The
+   padding pushes a white halo past that ring and gives it back its outline. */
 .logo {
   flex: none;
   width: 330px;
   height: 330px;
+  padding: 9px;
+  border-radius: 50%;
+  background: #fff;
   object-fit: contain;
 }
 
 .title {
   margin: 0;
-  font-size: 2.25rem;
+  font-size: 2.5rem;
   line-height: 1.15;
   letter-spacing: -.02em;
   text-wrap: balance;
+  color: #fff;
 }
+
+/* Section labels ---------------------------------------------------------- */
+
+/* Small uppercase label plus a short clay rule. The page was one unbroken
+   column of cards with nothing naming its parts; these give it a rhythm and a
+   landmark for the eye on the way down. Clay is the league accent and was
+   barely used anywhere — this is most of where it earns its keep now. */
+.eyebrow {
+  max-width: var(--column);
+  margin: 0 auto .85rem;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.eyebrow::after {
+  content: '';
+  display: block;
+  width: 42px;
+  height: 3px;
+  margin-top: .5rem;
+  border-radius: 2px;
+  background: var(--clay);
+}
+
+/* The one that opens a new section further down the page needs more air above
+   it than the gap between a label and the block it names. */
+.eyebrowTop { margin-top: 3rem; }
 
 /* "Next games" strip ------------------------------------------------------ */
 .nextStrip {
@@ -59,14 +106,8 @@
   background: #fffaf7;
 }
 
-.nextLabel {
-  font-size: .6875rem;
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--clay-dark);
-}
-
+/* No "Next games" label inside the strip any more — the section eyebrow above
+   it says the same thing, and saying it twice in two styles looked accidental. */
 .nextDate { font-size: 1.0625rem; font-weight: 700; }
 
 .nextCount { font-size: .9375rem; color: var(--ink-soft); }
@@ -128,28 +169,71 @@
   color: var(--ink-mute);
 }
 
-/* Footer links ------------------------------------------------------------ */
-.pageFoot {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .75rem 1.75rem;
+/* Page tiles -------------------------------------------------------------- */
+
+/* These replaced a row of four bare text links. Cards give each destination a
+   real target to hit and room for a line saying what is behind it, and they
+   stop the page trailing off into nothing at the bottom. */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
   max-width: var(--column);
-  margin: 2.5rem auto 0;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--line);
+  margin: 0 auto;
 }
 
-.footLink { font-size: 1rem; font-weight: 600; }
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+  padding: 1.15rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}
+/* Matches how .nextStrip already answers a hover, so the two agree. */
+.tile:hover {
+  text-decoration: none;
+  border-color: var(--clay);
+  background: #fffaf7;
+}
+
+.tileHead { display: flex; align-items: baseline; gap: .75rem; }
+
+.tileTitle { font-size: 1.0625rem; font-weight: 700; }
+
+.tileGo {
+  margin-left: auto;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--clay);
+}
+
+.tileNote { font-size: .875rem; line-height: 1.45; color: var(--ink-soft); }
 
 /* Below the point where badge + heading stop fitting side by side, stack and
    centre rather than shrinking the badge back down to unreadable. */
 @media (max-width: 800px) {
-  .masthead { flex-direction: column; text-align: center; gap: 1rem; }
+  .masthead {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.25rem;
+    padding: 2rem 1.25rem;
+  }
   .logo { width: 300px; height: 300px; }
-  .title { font-size: 1.875rem; }
+  .title { font-size: 2rem; }
+}
+
+/* Side by side, two tiles get too narrow to hold their note on one or two
+   lines, and the ragged heights read worse than a single column. */
+@media (max-width: 640px) {
+  .tiles { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media (max-width: 560px) {
+  .masthead { padding: 1.5rem 1rem; }
   .logo { width: 260px; height: 260px; }
   .title { font-size: 1.5rem; }
   .post { padding: 1.25rem; }
