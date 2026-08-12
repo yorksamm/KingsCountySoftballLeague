@@ -60,7 +60,9 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  min-height: 60px;
+  /* Tall enough to give the badge room to breathe rather than filling the bar
+     edge to edge — the mark is 56px, leaving 10px of clearance either side. */
+  min-height: 76px;
   flex-wrap: wrap;
 }
 
@@ -74,15 +76,13 @@
 .brand:hover { text-decoration: none; }
 
 .mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px; height: 38px;
-  border-radius: 50%;
-  background: var(--clay);
-  font-size: .75rem;
-  font-weight: 800;
-  letter-spacing: .02em;
+  flex: none;
+  width: 56px;
+  height: 56px;
+  /* The badge carries its own circular border and transparent surround, so it
+     needs no background of its own — it sits straight on the navy bar.
+     The file is 128px so this still has a 2x source on a retina screen. */
+  object-fit: contain;
 }
 
 .brandName {

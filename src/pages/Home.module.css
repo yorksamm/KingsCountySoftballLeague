@@ -4,38 +4,66 @@
 
 .page { }
 
+/* The masthead is a banner, not prose, so it is NOT held to the 720px reading
+   measure the announcements use. Inside that column a side-by-side badge could
+   not get past ~210px without crushing the heading, and the badge's own
+   wordmark was unreadable at that size. Going wider buys the room.
+
+   It sits on the page canvas with a rule under it rather than in a filled navy
+   panel. The panel was too loud for what is otherwise a light page — a block of
+   brand colour arriving before any content, reading as an ad rather than as the
+   top of the page. The rule gives the same "this is the masthead" break without
+   putting a second navy slab under the navy site header. */
 .masthead {
-  max-width: 720px;
-  margin: 0 auto 1.5rem;
-  padding-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2.25rem;
+  max-width: var(--column);
+  margin: 0 auto 1.75rem;
+  padding-bottom: 1.5rem;
   border-bottom: 3px solid var(--navy-900);
-  text-align: center;
 }
 
-/* width/height are on the element so the browser reserves the space before the
-   file arrives — otherwise the whole page jumps down when it loads. */
+/* Wide crest rather than a square badge, so this is sized on width alone and
+   lets its own 3:2 aspect set the height. width/height attributes on the
+   element reserve the space, so the page doesn't jump when the file loads. */
 .logo {
-  display: block;
-  width: 100%;
+  width: min(660px, 100%);
   height: auto;
-  max-width: 720px;
-  margin: 0 auto .75rem;
-  border-radius: var(--radius);
 }
 
-.title {
-  margin: 0;
-  font-size: 2rem;
-  line-height: 1.15;
-  letter-spacing: -.02em;
-}
+/* No .title rule: the masthead heading is visually hidden, so it takes the
+   shared .visually-hidden utility and needs no typography of its own. */
 
-.tagline {
-  margin: .35rem 0 0;
-  text-align: center;
-  font-size: 1.0625rem;
+/* Section labels ---------------------------------------------------------- */
+
+/* Small uppercase label plus a short clay rule. The page was one unbroken
+   column of cards with nothing naming its parts; these give it a rhythm and a
+   landmark for the eye on the way down. Clay is the league accent and was
+   barely used anywhere — this is most of where it earns its keep now. */
+.eyebrow {
+  max-width: var(--column);
+  margin: 0 auto .85rem;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
   color: var(--ink-soft);
 }
+.eyebrow::after {
+  content: '';
+  display: block;
+  width: 42px;
+  height: 3px;
+  margin-top: .5rem;
+  border-radius: 2px;
+  background: var(--clay);
+}
+
+/* The one that opens a new section further down the page needs more air above
+   it than the gap between a label and the block it names. */
+.eyebrowTop { margin-top: 3rem; }
 
 /* "Next games" strip ------------------------------------------------------ */
 .nextStrip {
@@ -43,7 +71,7 @@
   flex-wrap: wrap;
   align-items: baseline;
   gap: .35rem .85rem;
-  max-width: 720px;
+  max-width: var(--column);
   margin: 0 auto 2rem;
   padding: .95rem 1.15rem;
   border: 1px solid var(--line);
@@ -60,14 +88,8 @@
   background: #fffaf7;
 }
 
-.nextLabel {
-  font-size: .6875rem;
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--clay-dark);
-}
-
+/* No "Next games" label inside the strip any more — the section eyebrow above
+   it says the same thing, and saying it twice in two styles looked accidental. */
 .nextDate { font-size: 1.0625rem; font-weight: 700; }
 
 .nextCount { font-size: .9375rem; color: var(--ink-soft); }
@@ -76,7 +98,7 @@
 
 /* Posts ------------------------------------------------------------------- */
 .feed {
-  max-width: 720px;
+  max-width: var(--column);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -129,21 +151,69 @@
   color: var(--ink-mute);
 }
 
-/* Footer links ------------------------------------------------------------ */
-.pageFoot {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .75rem 1.75rem;
-  max-width: 720px;
-  margin: 2.5rem auto 0;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--line);
+/* Page tiles -------------------------------------------------------------- */
+
+/* These replaced a row of four bare text links. Cards give each destination a
+   real target to hit, and they stop the page trailing off into nothing at the
+   bottom.
+
+   Four across, not two: carrying only a label, a half-width tile was a long
+   short bar of mostly empty card, which is the sparseness these were meant to
+   fix. At --column four labels fit with room to spare. */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  max-width: var(--column);
+  margin: 0 auto;
 }
 
-.footLink { font-size: 1rem; font-weight: 600; }
+.tile {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  min-height: 60px;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}
+/* Matches how .nextStrip already answers a hover, so the two agree. */
+.tile:hover {
+  text-decoration: none;
+  border-color: var(--clay);
+  background: #fffaf7;
+}
+
+.tileTitle { font-size: 1.0625rem; font-weight: 700; }
+
+.tileGo {
+  margin-left: auto;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--clay);
+}
+
+/* No .logo override needed at any width: min(660px, 100%) already shrinks it
+   to the column, and height: auto keeps the crest's aspect ratio. */
+
+/* "Upcoming games" plus the arrow and padding needs 209px of tile, so four
+   across only works once the viewport clears about 920px. 940 leaves a little
+   headroom. Deliberately not tied to the masthead's 800px stacking point —
+   the two want different thresholds. */
+@media (max-width: 940px) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Same 209px floor: two across wraps below roughly 470px of viewport. Dropping
+   to one column at 520 clears that and covers every phone width. */
+@media (max-width: 520px) {
+  .tiles { grid-template-columns: minmax(0, 1fr); }
+}
 
 @media (max-width: 560px) {
-  .title { font-size: 1.625rem; }
   .post { padding: 1.25rem; }
   .postTitle { font-size: 1.25rem; }
   .nextGo { margin-left: 0; }

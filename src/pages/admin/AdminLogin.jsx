@@ -48,7 +48,7 @@ export default function AdminLogin() {
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.brand}>
-          <span className={styles.mark}>{LEAGUE.short}</span>
+          <img className={styles.mark} src="/kcsl-mark.png" width="96" height="96" alt="" aria-hidden="true" />
           <div>
             <h1 className={styles.title}>League Admin</h1>
             <p className={styles.subtitle}>{LEAGUE.name}</p>
