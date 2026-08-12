@@ -57,13 +57,10 @@ export default function Home() {
           aria-hidden="true"
           fetchpriority="high"
         />
-        {/* One heading, not a title plus a subtitle. The badge already
-            carries the league's name visually, so the wordmark reads as the
-            masthead line rather than repeating it above a grey subheading —
-            and it still contains the league name for search engines. */}
-        <h1 className={styles.title}>
-          The Official Home of the Kings County Softball League
-        </h1>
+        {/* Just the league name — no strapline and no subheading beneath
+            it. The badge carries the branding; anything more here was the
+            same words a second and third time. */}
+        <h1 className={styles.title}>{LEAGUE.name}</h1>
       </header>
 
       {/* Landing page still has to answer "when do we play next?" in one look,
