@@ -160,10 +160,11 @@ export function computeStandings(games, teams, divisionId) {
     rd: r.rf - r.ra,
   }))
 
-  // Sort: win percentage first, run differential as tiebreaker (docs Section 7).
-  // Team name breaks a full tie so the order is stable between renders.
+  // Sort: win percentage first, then total wins, then run
+  // differential. Team name breaks a full tie so the order is stable.
   table.sort((a, b) =>
     b.pct - a.pct ||
+    b.won - a.won ||
     b.rd - a.rd ||
     a.team.localeCompare(b.team)
   )
